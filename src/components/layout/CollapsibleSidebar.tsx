@@ -58,7 +58,7 @@ export default function CollapsibleSidebar() {
         onClick={toggleSidebar}
       >
         <div className="flex items-center space-x-3 min-w-0 flex-1">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#32b8c6] to-[#1a6873] rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-white font-semibold text-sm">NL</span>
           </div>
           <span 
@@ -97,7 +97,7 @@ export default function CollapsibleSidebar() {
                     transition-all duration-200 group relative
                     ${
                       isActive
-                        ? 'bg-[#32b8c6]/10 text-[#32b8c6]'
+                        ? 'bg-[#D67C3C]/10 text-[#D67C3C]'
                         : 'text-white/60 hover:text-white hover:bg-white/5'
                     }
                   `}

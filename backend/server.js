@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 require('dotenv').config();
 
 const { sequelize } = require('./config/database');
@@ -44,6 +45,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // API Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
@@ -51,9 +55,34 @@ app.use('/api/vehicles', require('./routes/vehicle.routes'));
 app.use('/api/orders', require('./routes/order.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
 
+// New Dashboard Routes
+app.use('/api/wishlist', require('./routes/wishlist.routes'));
+app.use('/api/messages', require('./routes/messages.routes'));
+app.use('/api/notifications', require('./routes/notifications.routes'));
+app.use('/api/billing', require('./routes/billing.routes'));
+app.use('/api/documents', require('./routes/documents.routes'));
+app.use('/api/settings', require('./routes/settings.routes'));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'NordLion API is running' });
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'NordLion API is running',
+    timestamp: new Date().toISOString(),
+    routes: {
+      auth: '/api/auth',
+      users: '/api/users',
+      vehicles: '/api/vehicles',
+      orders: '/api/orders',
+      admin: '/api/admin',
+      wishlist: '/api/wishlist',
+      messages: '/api/messages',
+      notifications: '/api/notifications',
+      billing: '/api/billing',
+      documents: '/api/documents',
+      settings: '/api/settings'
+    }
+  });
 });
 
 // 404 handler
@@ -86,6 +115,19 @@ const startServer = async () => {
       console.log(`🚀 NordLion API server running on port ${PORT}`);
       console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`   Database: ${process.env.DB_NAME}`);
+      console.log(`   API Health: http://localhost:${PORT}/health`);
+      console.log('\n📋 Available Routes:');
+      console.log('   - /api/auth');
+      console.log('   - /api/users');
+      console.log('   - /api/vehicles');
+      console.log('   - /api/orders');
+      console.log('   - /api/admin');
+      console.log('   - /api/wishlist');
+      console.log('   - /api/messages');
+      console.log('   - /api/notifications');
+      console.log('   - /api/billing');
+      console.log('   - /api/documents');
+      console.log('   - /api/settings');
     });
   } catch (error) {
     console.error('❌ Unable to start server:', error);

@@ -14,9 +14,6 @@ import {
   Bell,
   CreditCard,
   LogOut,
-  Pin,
-  PinOff,
-  ChevronRight,
 } from 'lucide-react'
 
 const navigation = [
@@ -34,72 +31,42 @@ const navigation = [
 export default function CollapsibleSidebar() {
   const pathname = usePathname()
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
-  const [isHovering, setIsHovering] = useState(false)
-  const [showArrow, setShowArrow] = useState(true)
 
-  // Load pinned state from localStorage
+  // Load expanded state from localStorage
   useEffect(() => {
-    const pinned = localStorage.getItem('sidebar-pinned') === 'true'
-    setIsPinned(pinned)
-    setIsExpanded(pinned)
-    setShowArrow(!pinned)
+    const expanded = localStorage.getItem('sidebar-expanded') === 'true'
+    setIsExpanded(expanded)
   }, [])
 
-  // Handle pin toggle
-  const togglePin = () => {
-    const newPinnedState = !isPinned
-    setIsPinned(newPinnedState)
-    localStorage.setItem('sidebar-pinned', String(newPinnedState))
-    if (!newPinnedState) {
-      setIsExpanded(false)
-    }
-    setShowArrow(!newPinnedState)
-  }
-
-  // Handle hover with arrow delay
-  const handleMouseEnter = () => {
-    if (!isPinned) {
-      setIsHovering(true)
-      setIsExpanded(true)
-      setShowArrow(false)
-    }
-  }
-
-  const handleMouseLeave = () => {
-    if (!isPinned) {
-      setIsHovering(false)
-      setIsExpanded(false)
-      // Delay arrow appearance until sidebar is fully collapsed
-      setTimeout(() => {
-        if (!isPinned && !isHovering) {
-          setShowArrow(true)
-        }
-      }, 400) // 300ms transition + 100ms buffer
-    }
+  // Handle toggle
+  const toggleSidebar = () => {
+    const newState = !isExpanded
+    setIsExpanded(newState)
+    localStorage.setItem('sidebar-expanded', String(newState))
   }
 
   const sidebarWidth = isExpanded ? 'w-64' : 'w-20'
 
   return (
     <aside
-      className={`${sidebarWidth} fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out z-[100] flex flex-col shadow-2xl`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={`${sidebarWidth} h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out flex flex-col shadow-2xl`}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
       {/* Logo Section */}
-      <div className="h-16 flex items-center px-4 border-b border-white/5 flex-shrink-0 overflow-hidden">
-        <Link href="/dashboard" className="flex items-center space-x-3 min-w-0 flex-1">
+      <div 
+        className="h-16 flex items-center px-4 border-b border-white/5 flex-shrink-0 overflow-hidden cursor-pointer hover:bg-white/5 transition-colors"
+        onClick={toggleSidebar}
+      >
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
           <div className="w-8 h-8 bg-gradient-to-br from-[#32b8c6] to-[#1a6873] rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">NL</span>
+            <span className="text-white font-semibold text-sm">NL</span>
           </div>
           <span 
-            className={`text-white font-semibold text-lg whitespace-nowrap transition-all duration-300 ${
+            className={`text-white font-medium text-base whitespace-nowrap transition-all duration-300 ${
               isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
             }`}
             style={{ 
-              transitionDelay: isExpanded ? '150ms' : '0ms',
+              transitionDelay: isExpanded ? '100ms' : '0ms',
               minWidth: isExpanded ? 'auto' : '0',
               width: isExpanded ? 'auto' : '0',
               overflow: 'hidden'
@@ -107,25 +74,11 @@ export default function CollapsibleSidebar() {
           >
             NordLion
           </span>
-        </Link>
-        <button
-          onClick={togglePin}
-          className={`p-1.5 hover:bg-white/5 rounded-lg transition-all duration-300 flex-shrink-0 ml-auto ${
-            isExpanded ? 'opacity-100 translate-x-0 visible' : 'opacity-0 translate-x-4 invisible'
-          }`}
-          style={{ transitionDelay: isExpanded ? '150ms' : '0ms' }}
-          aria-label={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
-        >
-          {isPinned ? (
-            <Pin className="w-4 h-4 text-[#32b8c6]" />
-          ) : (
-            <PinOff className="w-4 h-4 text-white/40" />
-          )}
-        </button>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-6 px-2 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <nav className="flex-1 py-4 px-2 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <style jsx>{`
           nav::-webkit-scrollbar {
             display: none;
@@ -140,7 +93,7 @@ export default function CollapsibleSidebar() {
                 <Link
                   href={item.href}
                   className={`
-                    flex items-center ${isExpanded ? 'px-4' : 'px-3 justify-center'} py-3 rounded-lg
+                    flex items-center ${isExpanded ? 'px-3' : 'px-3 justify-center'} py-2.5 rounded-lg
                     transition-all duration-200 group relative
                     ${
                       isActive
@@ -153,16 +106,16 @@ export default function CollapsibleSidebar() {
                     className={`${isExpanded ? 'mr-3' : ''} w-5 h-5 flex-shrink-0 transition-all duration-200`}
                   />
                   <span 
-                    className={`whitespace-nowrap font-medium text-sm transition-all duration-300 ${
+                    className={`whitespace-nowrap font-normal text-sm transition-all duration-300 ${
                       isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute'
                     }`}
-                    style={{ transitionDelay: isExpanded ? '100ms' : '0ms' }}
+                    style={{ transitionDelay: isExpanded ? '80ms' : '0ms' }}
                   >
                     {item.name}
                   </span>
                   {/* Tooltip for collapsed state */}
-                  {!isExpanded && !isHovering && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-[#1a1a1a] text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[110] border border-white/10">
+                  {!isExpanded && (
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-[#1a1a1a] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[110] border border-white/10 font-normal">
                       {item.name}
                     </div>
                   )}
@@ -174,41 +127,24 @@ export default function CollapsibleSidebar() {
       </nav>
 
       {/* User Section */}
-      <div className="border-t border-white/5 p-4 flex-shrink-0">
+      <div className="border-t border-white/5 p-3 flex-shrink-0">
         <button
           className={`
-            flex items-center w-full ${isExpanded ? 'px-3' : 'justify-center'} py-3 rounded-lg
+            flex items-center w-full ${isExpanded ? 'px-3' : 'justify-center'} py-2.5 rounded-lg
             text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200
           `}
         >
           <LogOut className={`${isExpanded ? 'mr-3' : ''} w-5 h-5 flex-shrink-0`} />
           <span 
-            className={`whitespace-nowrap font-medium text-sm transition-all duration-300 ${
+            className={`whitespace-nowrap font-normal text-sm transition-all duration-300 ${
               isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute'
             }`}
-            style={{ transitionDelay: isExpanded ? '100ms' : '0ms' }}
+            style={{ transitionDelay: isExpanded ? '80ms' : '0ms' }}
           >
             Logout
           </span>
         </button>
       </div>
-
-      {/* Expand Button - Smooth fade-in with delay */}
-      <button
-        onClick={() => {
-          setIsPinned(true)
-          setIsExpanded(true)
-          setShowArrow(false)
-          localStorage.setItem('sidebar-pinned', 'true')
-        }}
-        className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] z-[110] shadow-lg hover:shadow-xl transition-all duration-300 ${
-          !showArrow ? 'opacity-0 invisible' : 'opacity-100 visible'
-        }`}
-        style={{ left: '84px' }}
-        aria-label="Expand sidebar"
-      >
-        <ChevronRight className="w-3 h-3" />
-      </button>
     </aside>
   )
 }

@@ -73,7 +73,7 @@ export default function CollapsibleSidebar() {
 
   return (
     <aside
-      className={`${sidebarWidth} fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out z-[100] flex flex-col overflow-hidden`}
+      className={`${sidebarWidth} fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out z-[100] flex flex-col shadow-xl`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -178,7 +178,7 @@ export default function CollapsibleSidebar() {
         </button>
       </div>
 
-      {/* Expand/Collapse Button - Only show when not hovering and not pinned */}
+      {/* Expand Button - Fixed positioning */}
       {!isHovering && !isPinned && (
         <button
           onClick={() => {
@@ -186,7 +186,8 @@ export default function CollapsibleSidebar() {
             setIsExpanded(true)
             localStorage.setItem('sidebar-pinned', 'true')
           }}
-          className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] transition-colors z-[110]"
+          className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] transition-all duration-200 z-[110] shadow-lg"
+          style={{ left: '76px' }}
           aria-label="Expand sidebar"
         >
           <ChevronRight className="w-3 h-3" />

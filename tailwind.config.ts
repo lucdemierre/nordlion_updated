@@ -11,17 +11,16 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#fef5ed',
+          100: '#fde8d4',
+          200: '#fac9a8',
+          300: '#f7a471',
+          400: '#f37738',
+          500: '#D67C3C',
+          600: '#B85A1F',
+          700: '#8b3f10',
+          800: '#6d3210',
+          900: '#4f2610',
         },
         accent: {
           50: '#fef3c7',
@@ -50,12 +49,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-orbitron)', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'luxury-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'luxury-gradient': 'linear-gradient(135deg, #D67C3C 0%, #B85A1F 100%)',
         'dark-gradient': 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)',
       },
       animation: {
@@ -88,7 +86,7 @@ const config: Config = {
         },
       },
       boxShadow: {
-        'luxury': '0 10px 40px -10px rgba(102, 126, 234, 0.5)',
+        'luxury': '0 10px 40px -10px rgba(214, 124, 60, 0.5)',
         'dark': '0 20px 60px -10px rgba(0, 0, 0, 0.9)',
       },
     },

@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    remember: false,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,14 +22,20 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 800))
 
       const user = validateCredentials(formData.email, formData.password)
 
       if (user) {
         setAuthToken(user)
-        router.push('/dashboard')
+        // Redirect based on role
+        if (user.role === 'admin') {
+          router.push('/admin')
+        } else if (user.role === 'broker') {
+          router.push('/broker')
+        } else {
+          router.push('/client')
+        }
       } else {
         setError('Invalid email or password')
       }
@@ -47,21 +52,31 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#22c55e] to-[#16a34a] rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-lg">NL</span>
             </div>
-            <span className="text-2xl font-bold text-white">NordLion</span>
+            <span className="text-2xl font-light text-white">NordLion</span>
           </Link>
-          <h1 className="text-2xl font-light text-white mt-6 mb-2">Welcome back</h1>
-          <p className="text-white/50 text-sm font-light">Sign in to your account</p>
+          <h1 className="text-2xl font-light text-white mt-6 mb-2">Welcome</h1>
+          <p className="text-white/50 text-sm font-light">Sign in to access your dashboard</p>
         </div>
 
-        {/* Test Credentials Info */}
-        <div className="bg-[#D67C3C]/10 border border-[#D67C3C]/20 rounded-xl p-4 mb-6">
-          <p className="text-[#D67C3C] text-sm font-medium mb-2">Test Credentials:</p>
-          <div className="space-y-1 text-xs text-white/70 font-light">
-            <p>Admin: admin@nordlionauto.com / admin123</p>
-            <p>User: test@nordlionauto.com / test123</p>
+        {/* Test Credentials */}
+        <div className="bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-xl p-4 mb-6">
+          <p className="text-[#22c55e] text-sm font-medium mb-3">Test Accounts:</p>
+          <div className="space-y-2 text-xs text-white/70 font-light">
+            <div>
+              <p className="text-white/90 font-medium mb-1">Client Dashboard:</p>
+              <p>client@nordlionauto.com / client123</p>
+            </div>
+            <div>
+              <p className="text-white/90 font-medium mb-1">Broker Dashboard:</p>
+              <p>broker@nordlionauto.com / broker123</p>
+            </div>
+            <div>
+              <p className="text-white/90 font-medium mb-1">Admin Dashboard:</p>
+              <p>admin@nordlionauto.com / admin123</p>
+            </div>
           </div>
         </div>
 
@@ -74,7 +89,7 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-2">
+            <label htmlFor="email" className="block text-sm font-light text-white/70 mb-2">
               Email
             </label>
             <input
@@ -83,13 +98,13 @@ export default function LoginPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors"
+              className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22c55e] transition-colors font-light"
               placeholder="Enter your email"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-white/70 mb-2">
+            <label htmlFor="password" className="block text-sm font-light text-white/70 mb-2">
               Password
             </label>
             <div className="relative">
@@ -99,7 +114,7 @@ export default function LoginPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors pr-12"
+                className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22c55e] transition-colors pr-12 font-light"
                 placeholder="Enter your password"
               />
               <button
@@ -112,25 +127,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.remember}
-                onChange={(e) => setFormData({ ...formData, remember: e.target.checked })}
-                className="w-4 h-4 rounded border-white/20 bg-[#1a1a1a] text-[#D67C3C] focus:ring-[#D67C3C] focus:ring-offset-0"
-              />
-              <span className="text-sm text-white/60 font-light">Remember me</span>
-            </label>
-            <Link href="/auth/forgot-password" className="text-sm text-[#D67C3C] hover:text-[#B85A1F] transition-colors font-light">
-              Forgot password?
-            </Link>
-          </div>
-
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -142,14 +142,6 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-
-        {/* Register Link */}
-        <p className="text-center text-sm text-white/60 font-light mt-6">
-          Don't have an account?{' '}
-          <Link href="/auth/register" className="text-[#D67C3C] hover:text-[#B85A1F] transition-colors font-medium">
-            Sign up
-          </Link>
-        </p>
       </div>
     </div>
   )

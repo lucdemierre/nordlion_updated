@@ -1,5 +1,4 @@
-// Enhanced authentication with multiple roles
-// In production, use proper authentication like NextAuth.js
+// Enhanced authentication with role-based access
 
 export type UserRole = 'client' | 'broker' | 'admin'
 
@@ -9,12 +8,11 @@ export interface User {
   firstName: string
   lastName: string
   role: UserRole
-  verified: boolean
-  profileComplete: boolean
-  twoFactorEnabled: boolean
+  avatar?: string
+  phone?: string
 }
 
-// Test credentials for different roles
+// Test accounts for all roles
 const TEST_USERS = [
   {
     id: '1',
@@ -22,32 +20,26 @@ const TEST_USERS = [
     password: 'admin123',
     firstName: 'Admin',
     lastName: 'User',
-    role: 'admin' as const,
-    verified: true,
-    profileComplete: true,
-    twoFactorEnabled: false,
+    role: 'admin' as UserRole,
+    phone: '+44 20 1234 5678',
   },
   {
     id: '2',
     email: 'broker@nordlionauto.com',
     password: 'broker123',
     firstName: 'Broker',
-    lastName: 'Agent',
-    role: 'broker' as const,
-    verified: true,
-    profileComplete: true,
-    twoFactorEnabled: false,
+    lastName: 'Manager',
+    role: 'broker' as UserRole,
+    phone: '+44 20 1234 5679',
   },
   {
     id: '3',
     email: 'client@nordlionauto.com',
     password: 'client123',
     firstName: 'John',
-    lastName: 'Doe',
-    role: 'client' as const,
-    verified: false,
-    profileComplete: false,
-    twoFactorEnabled: false,
+    lastName: 'Smith',
+    role: 'client' as UserRole,
+    phone: '+44 20 1234 5680',
   },
 ]
 
@@ -67,7 +59,8 @@ export function validateCredentials(email: string, password: string): User | nul
 export function setAuthToken(user: User) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('auth_user', JSON.stringify(user))
-    localStorage.setItem('auth_token', 'token_' + user.id + '_' + user.role)
+    localStorage.setItem('auth_token', `nl_token_${user.id}_${Date.now()}`)
+    localStorage.setItem('auth_role', user.role)
   }
 }
 
@@ -92,12 +85,9 @@ export function getCurrentUser(): User | null {
   return null
 }
 
-export function updateCurrentUser(updates: Partial<User>) {
-  const user = getCurrentUser()
-  if (user) {
-    const updatedUser = { ...user, ...updates }
-    setAuthToken(updatedUser)
-    return updatedUser
+export function getUserRole(): UserRole | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth_role') as UserRole | null
   }
   return null
 }
@@ -106,6 +96,7 @@ export function logout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_user')
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_role')
   }
 }
 
@@ -113,9 +104,16 @@ export function isAuthenticated(): boolean {
   return getAuthToken() !== null
 }
 
-export function requireAuth(allowedRoles?: UserRole[]) {
-  const user = getCurrentUser()
-  if (!user) return false
-  if (allowedRoles && !allowedRoles.includes(user.role)) return false
-  return true
+export function hasRole(role: UserRole): boolean {
+  return getUserRole() === role
+}
+
+export function canAccessDashboard(requiredRole?: UserRole): boolean {
+  if (!isAuthenticated()) return false
+  if (!requiredRole) return true
+  
+  const userRole = getUserRole()
+  if (userRole === 'admin') return true // Admin can access everything
+  
+  return userRole === requiredRole
 }

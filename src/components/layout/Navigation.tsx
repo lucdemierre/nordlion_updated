@@ -45,10 +45,10 @@ export default function Navigation() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#32b8c6] to-[#1a6873] rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">NL</span>
               </div>
-              <span className="text-2xl font-bold text-white group-hover:text-[#32b8c6] transition-colors">
+              <span className="text-2xl font-bold text-white group-hover:text-[#D67C3C] transition-colors">
                 NORDLION
               </span>
             </motion.div>
@@ -67,7 +67,7 @@ export default function Navigation() {
                   href={item.href}
                   className={`px-4 py-2 rounded-lg font-medium transition-all relative ${
                     isActive(item.href)
-                      ? 'text-[#32b8c6] bg-[#32b8c6]/10'
+                      ? 'text-[#D67C3C] bg-[#D67C3C]/10'
                       : 'text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
@@ -91,13 +91,13 @@ export default function Navigation() {
               className="p-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all relative"
             >
               <ShoppingCart size={20} />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#32b8c6] text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#D67C3C] text-white text-xs rounded-full flex items-center justify-center">
                 0
               </span>
             </Link>
             <Link
               href="/contact"
-              className="px-6 py-2.5 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-2.5 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg font-medium transition-colors"
             >
               Get Started
             </Link>
@@ -129,7 +129,7 @@ export default function Navigation() {
                   href={item.href}
                   className={`block px-4 py-3 rounded-lg font-medium transition-all ${
                     isActive(item.href)
-                      ? 'text-[#32b8c6] bg-[#32b8c6]/10'
+                      ? 'text-[#D67C3C] bg-[#D67C3C]/10'
                       : 'text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -148,7 +148,7 @@ export default function Navigation() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="block px-4 py-3 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white text-center rounded-lg font-medium transition-colors"
+                  className="block px-4 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white text-center rounded-lg font-medium transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Get Started

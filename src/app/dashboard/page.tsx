@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import DraggableWidget from '@/components/dashboard/DraggableWidget'
-import { Package, Heart, Clock, CheckCircle, TrendingUp, DollarSign } from 'lucide-react'
+import { Package, Heart, Clock, CheckCircle, TrendingUp, Phone } from 'lucide-react'
+import Link from 'next/link'
 
 interface Widget {
   id: string
@@ -78,8 +79,8 @@ export default function DashboardPage() {
       type: 'action' as const,
       order: 6,
       content: {
-        icon: DollarSign,
-        iconColor: 'text-purple-400',
+        icon: Phone,
+        iconColor: 'text-[#D67C3C]',
         title: 'Need Assistance?',
         description: 'Our concierge team is available 24/7 to help with any questions or concerns.',
         buttonText: 'Contact Support',
@@ -120,7 +121,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-semibold text-white mb-1">Welcome Back</h1>
-            <p className="text-white/50 text-sm font-light">Here’s an overview of your activity</p>
+            <p className="text-white/50 text-sm font-light">Here's an overview of your activity</p>
           </div>
           <div className="text-right">
             <p className="text-white/40 text-xs font-light">Last login</p>
@@ -149,7 +150,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="text-3xl font-semibold text-white mb-1">{stat.value}</div>
                   <div className="text-sm text-white/50 font-light">{stat.name}</div>
-                  <div className="text-xs text-[#32b8c6] mt-2 font-normal">{stat.change}</div>
+                  <div className="text-xs text-[#D67C3C] mt-2 font-normal">{stat.change}</div>
                 </div>
               </DraggableWidget>
             )
@@ -171,9 +172,9 @@ export default function DashboardPage() {
               <div className="p-6 border-b border-white/5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium text-white">Recent Orders</h3>
-                  <button className="text-[#32b8c6] hover:text-[#2aa0ad] text-sm font-normal transition-colors">
+                  <Link href="/dashboard/orders" className="text-[#D67C3C] hover:text-[#B85A1F] text-sm font-normal transition-colors">
                     View All
-                  </button>
+                  </Link>
                 </div>
               </div>
               <div className="divide-y divide-white/5">
@@ -236,11 +237,11 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className={`p-3 bg-gradient-to-br ${
                       isPrimary 
-                        ? 'from-[#32b8c6]/10 to-[#1a6873]/10' 
-                        : 'from-purple-500/10 to-purple-600/10'
+                        ? 'from-[#D67C3C]/10 to-[#B85A1F]/10' 
+                        : 'from-[#D67C3C]/10 to-[#B85A1F]/10'
                     } rounded-xl`}>
                       <Icon className={`w-5 h-5 ${
-                        action.iconColor || 'text-[#32b8c6]'
+                        action.iconColor || 'text-[#D67C3C]'
                       }`} />
                     </div>
                   </div>
@@ -250,7 +251,7 @@ export default function DashboardPage() {
                   </p>
                   <button className={`w-full py-2.5 px-4 rounded-xl text-sm font-normal transition-all ${
                     isPrimary
-                      ? 'bg-[#32b8c6] hover:bg-[#2aa0ad] text-white'
+                      ? 'bg-[#D67C3C] hover:bg-[#B85A1F] text-white'
                       : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
                   }`}>
                     {action.buttonText}

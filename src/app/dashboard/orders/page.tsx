@@ -1,217 +1,241 @@
 'use client'
 
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Search, Filter, Download, Eye, Package, Truck, CheckCircle, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { Package, Clock, CheckCircle2, XCircle, Truck, Eye, Download } from 'lucide-react'
+import Link from 'next/link'
 
 const orders = [
   {
     id: 'NL-2024-145',
     vehicle: 'Porsche 911 Turbo S',
-    model: '992 Turbo S',
+    year: '2024',
+    specs: '640 HP • 3.8L Twin-Turbo • AWD',
+    status: 'delivered',
+    statusText: 'Delivered',
     date: '2024-01-15',
     deliveryDate: '2024-02-20',
-    status: 'Delivered',
     amount: 245000,
     image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f3c8d?w=400&h=300&fit=crop',
-    progress: 100,
   },
   {
     id: 'NL-2024-132',
     vehicle: 'Mercedes-AMG GT',
-    model: 'AMG GT 63 S',
+    year: '2024',
+    specs: '577 HP • 4.0L V8 Twin-Turbo',
+    status: 'in_transit',
+    statusText: 'In Transit',
     date: '2024-01-10',
-    deliveryDate: '2024-02-15',
-    status: 'In Transit',
+    deliveryDate: '2024-02-28',
     amount: 189000,
     image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400&h=300&fit=crop',
-    progress: 75,
   },
   {
-    id: 'NL-2024-118',
-    vehicle: 'Audi RS e-tron GT',
-    model: 'RS e-tron GT',
+    id: 'NL-2024-098',
+    vehicle: 'Ferrari SF90 Stradale',
+    year: '2024',
+    specs: '986 HP • Hybrid • AWD',
+    status: 'processing',
+    statusText: 'Processing',
     date: '2024-01-05',
-    deliveryDate: '2024-02-10',
-    status: 'Processing',
-    amount: 142000,
-    image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop',
-    progress: 40,
+    deliveryDate: '2024-03-15',
+    amount: 625000,
+    image: 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=400&h=300&fit=crop',
   },
   {
     id: 'NL-2023-298',
     vehicle: 'BMW M8 Competition',
-    model: 'M8 Competition Coupe',
+    year: '2023',
+    specs: '617 HP • 4.4L V8 Twin-Turbo',
+    status: 'delivered',
+    statusText: 'Delivered',
     date: '2023-12-22',
-    deliveryDate: '2024-01-28',
-    status: 'Delivered',
+    deliveryDate: '2024-01-30',
     amount: 156000,
     image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&h=300&fit=crop',
-    progress: 100,
   },
   {
     id: 'NL-2023-276',
-    vehicle: 'Lamborghini Urus',
-    model: 'Urus Performante',
+    vehicle: 'Lamborghini Huracan EVO',
+    year: '2023',
+    specs: '631 HP • 5.2L V10',
+    status: 'cancelled',
+    statusText: 'Cancelled',
     date: '2023-12-10',
-    deliveryDate: '2024-01-15',
-    status: 'Delivered',
-    amount: 298000,
-    image: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=400&h=300&fit=crop',
-    progress: 100,
+    deliveryDate: null,
+    amount: 287000,
+    image: 'https://images.unsplash.com/photo-1519440985/53a0c1c46e92?w=400&h=300&fit=crop',
   },
 ]
 
-const statusConfig = {
-  'Delivered': { color: 'green', icon: CheckCircle, bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/20' },
-  'In Transit': { color: 'blue', icon: Truck, bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
-  'Processing': { color: 'yellow', icon: Package, bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/20' },
-  'Pending': { color: 'gray', icon: Clock, bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/20' },
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'delivered':
+      return 'bg-green-500/10 text-green-400 border-green-500/20'
+    case 'in_transit':
+      return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+    case 'processing':
+      return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+    case 'cancelled':
+      return 'bg-red-500/10 text-red-400 border-red-500/20'
+    default:
+      return 'bg-white/5 text-white/40 border-white/10'
+  }
+}
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'delivered':
+      return <CheckCircle2 className="w-4 h-4" />
+    case 'in_transit':
+      return <Truck className="w-4 h-4" />
+    case 'processing':
+      return <Clock className="w-4 h-4" />
+    case 'cancelled':
+      return <XCircle className="w-4 h-4" />
+    default:
+      return <Package className="w-4 h-4" />
+  }
 }
 
 export default function OrdersPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
-
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          order.id.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === 'all' || order.status.toLowerCase().includes(filterStatus.toLowerCase())
-    return matchesSearch && matchesFilter
-  })
-
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
+      <div className="p-8 space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Orders</h1>
-            <p className="text-white/60 text-lg">Manage and track all your vehicle orders</p>
+            <h1 className="text-3xl font-semibold text-white mb-1">Orders</h1>
+            <p className="text-white/50 text-sm font-light">Track and manage your vehicle orders</p>
           </div>
-          <button className="px-6 py-3 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-xl font-medium transition-all flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-sm font-normal transition-colors">
+              Filter
+            </button>
+            <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] rounded-xl text-white text-sm font-normal transition-colors">
+              New Order
+            </button>
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-4 flex-wrap">
-          <div className="flex-1 min-w-[300px]">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search orders by vehicle or ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-[#141414] border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#32b8c6] transition-colors"
-              />
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-[#D67C3C]/10 rounded-lg">
+                <Package className="w-5 h-5 text-[#D67C3C]" />
+              </div>
+              <div>
+                <div className="text-2xl font-semibold text-white">5</div>
+                <div className="text-xs text-white/50 font-light">Total Orders</div>
+              </div>
             </div>
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-6 py-3 bg-[#141414] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors cursor-pointer"
-          >
-            <option value="all">All Status</option>
-            <option value="delivered">Delivered</option>
-            <option value="transit">In Transit</option>
-            <option value="processing">Processing</option>
-          </select>
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-yellow-500/10 rounded-lg">
+                <Clock className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div>
+                <div className="text-2xl font-semibold text-white">1</div>
+                <div className="text-xs text-white/50 font-light">Processing</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Truck className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <div className="text-2xl font-semibold text-white">1</div>
+                <div className="text-xs text-white/50 font-light">In Transit</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <CheckCircle2 className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <div className="text-2xl font-semibold text-white">2</div>
+                <div className="text-xs text-white/50 font-light">Delivered</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Orders List */}
-        <div className="space-y-4">
-          {filteredOrders.map((order) => {
-            const StatusIcon = statusConfig[order.status].icon
-            return (
-              <div
-                key={order.id}
-                className="bg-[#141414] rounded-2xl border border-white/5 hover:border-white/10 transition-all overflow-hidden group"
-              >
-                <div className="flex flex-col lg:flex-row gap-6 p-6">
+        <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden">
+          <div className="divide-y divide-white/5">
+            {orders.map((order) => (
+              <div key={order.id} className="p-6 hover:bg-white/[0.02] transition-colors">
+                <div className="flex items-start gap-6">
                   {/* Image */}
-                  <div className="w-full lg:w-48 h-32 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
+                  <div className="w-32 h-24 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img
                       src={order.image}
                       alt={order.vehicle}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
-                  {/* Order Details */}
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-start justify-between gap-4">
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="text-xl font-semibold text-white mb-1">{order.vehicle}</h3>
-                        <p className="text-white/50 text-sm">{order.model}</p>
+                        <h3 className="text-white font-medium mb-1">{order.vehicle}</h3>
+                        <p className="text-xs text-white/40 font-light">
+                          Order {order.id} • {order.date}
+                        </p>
                       </div>
-                      <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium ${statusConfig[order.status].bg} ${statusConfig[order.status].text} border ${statusConfig[order.status].border}`}>
-                        <StatusIcon className="w-4 h-4" />
-                        {order.status}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-white/40 text-xs mb-1">Order ID</p>
-                        <p className="text-white font-medium">{order.id}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/40 text-xs mb-1">Order Date</p>
-                        <p className="text-white font-medium">{order.date}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/40 text-xs mb-1">Delivery Date</p>
-                        <p className="text-white font-medium">{order.deliveryDate}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/40 text-xs mb-1">Amount</p>
-                        <p className="text-white font-bold">${order.amount.toLocaleString()}</p>
+                      <div className="text-right">
+                        <div className="text-white font-semibold mb-2">
+                          ${order.amount.toLocaleString()}
+                        </div>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-normal border ${getStatusColor(order.status)}`}>
+                          {getStatusIcon(order.status)}
+                          {order.statusText}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    {order.status !== 'Delivered' && (
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-white/60 text-sm">Order Progress</p>
-                          <p className="text-white/60 text-sm">{order.progress}%</p>
-                        </div>
-                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-[#32b8c6] to-[#1a6873] transition-all duration-500"
-                            style={{ width: `${order.progress}%` }}
-                          />
-                        </div>
-                      </div>
+                    <p className="text-sm text-white/50 font-light mb-3">{order.specs}</p>
+
+                    {order.deliveryDate && (
+                      <p className="text-xs text-white/40 font-light mb-4">
+                        {order.status === 'delivered' ? 'Delivered on' : 'Expected delivery'}: {order.deliveryDate}
+                      </p>
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-2">
-                      <button className="flex-1 px-4 py-2 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                        <Eye className="w-4 h-4" />
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/dashboard/orders/${order.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] rounded-lg text-white text-xs font-normal transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
                         View Details
-                      </button>
-                      <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-all border border-white/10">
-                        Track
-                      </button>
+                      </Link>
+                      {order.status === 'in_transit' && (
+                        <button className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white text-xs font-normal transition-colors">
+                          <Truck className="w-3.5 h-3.5" />
+                          Track Shipment
+                        </button>
+                      )}
+                      {order.status === 'delivered' && (
+                        <button className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white text-xs font-normal transition-colors">
+                          <Download className="w-3.5 h-3.5" />
+                          Download Invoice
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-            )
-          })}
-        </div>
-
-        {filteredOrders.length === 0 && (
-          <div className="bg-[#141414] rounded-2xl border border-white/5 p-12 text-center">
-            <Package className="w-16 h-16 text-white/20 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No orders found</h3>
-            <p className="text-white/60">Try adjusting your search or filter criteria</p>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </DashboardLayout>
   )

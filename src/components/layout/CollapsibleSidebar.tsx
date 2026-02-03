@@ -36,12 +36,14 @@ export default function CollapsibleSidebar() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
+  const [showArrow, setShowArrow] = useState(true)
 
   // Load pinned state from localStorage
   useEffect(() => {
     const pinned = localStorage.getItem('sidebar-pinned') === 'true'
     setIsPinned(pinned)
     setIsExpanded(pinned)
+    setShowArrow(!pinned)
   }, [])
 
   // Handle pin toggle
@@ -52,13 +54,15 @@ export default function CollapsibleSidebar() {
     if (!newPinnedState) {
       setIsExpanded(false)
     }
+    setShowArrow(!newPinnedState)
   }
 
-  // Handle hover
+  // Handle hover with arrow delay
   const handleMouseEnter = () => {
     if (!isPinned) {
       setIsHovering(true)
       setIsExpanded(true)
+      setShowArrow(false)
     }
   }
 
@@ -66,6 +70,12 @@ export default function CollapsibleSidebar() {
     if (!isPinned) {
       setIsHovering(false)
       setIsExpanded(false)
+      // Delay arrow appearance until sidebar is fully collapsed
+      setTimeout(() => {
+        if (!isPinned && !isHovering) {
+          setShowArrow(true)
+        }
+      }, 400) // 300ms transition + 100ms buffer
     }
   }
 
@@ -183,21 +193,22 @@ export default function CollapsibleSidebar() {
         </button>
       </div>
 
-      {/* Expand Button - Positioned further right to avoid overlap */}
-      {!isHovering && !isPinned && (
-        <button
-          onClick={() => {
-            setIsPinned(true)
-            setIsExpanded(true)
-            localStorage.setItem('sidebar-pinned', 'true')
-          }}
-          className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] transition-all duration-200 z-[110] shadow-lg hover:shadow-xl"
-          style={{ left: '84px' }}
-          aria-label="Expand sidebar"
-        >
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      )}
+      {/* Expand Button - Smooth fade-in with delay */}
+      <button
+        onClick={() => {
+          setIsPinned(true)
+          setIsExpanded(true)
+          setShowArrow(false)
+          localStorage.setItem('sidebar-pinned', 'true')
+        }}
+        className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] z-[110] shadow-lg hover:shadow-xl transition-all duration-300 ${
+          !showArrow ? 'opacity-0 invisible' : 'opacity-100 visible'
+        }`}
+        style={{ left: '84px' }}
+        aria-label="Expand sidebar"
+      >
+        <ChevronRight className="w-3 h-3" />
+      </button>
     </aside>
   )
 }

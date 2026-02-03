@@ -1,25 +1,28 @@
 import type { Metadata } from 'next'
-import { Inter, Orbitron } from 'next/font/google'
+import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ 
+const playfair = Playfair_Display({ 
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 })
 
-const orbitron = Orbitron({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-orbitron',
+  variable: '--font-inter',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'NordLion | Luxury Automotive Excellence',
-  description: 'Experience unparalleled luxury and performance with NordLion\'s curated collection of premium vehicles. Your journey to automotive excellence begins here.',
-  keywords: 'luxury cars, premium vehicles, exotic cars, high-performance automobiles, NordLion',
+  title: 'NordLion | Curated Luxury Automotive Excellence',
+  description: 'NordLion curates the world\'s most exceptional hypercars, luxury vehicles, and private jets. Experience unparalleled automotive excellence through our exclusive collection.',
+  keywords: 'luxury hypercars, exotic vehicles, private jets, automotive excellence, limited edition cars, Koenigsegg, rare automobiles, NordLion',
   openGraph: {
-    title: 'NordLion | Luxury Automotive Excellence',
-    description: 'Experience unparalleled luxury and performance',
+    title: 'NordLion | Curated Luxury Automotive Excellence',
+    description: 'Experience unparalleled luxury and performance through our curated collection',
     type: 'website',
   },
 }
@@ -31,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${orbitron.variable} font-sans antialiased`}>
+      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-dark-900`}>
         <Providers>
           {children}
         </Providers>

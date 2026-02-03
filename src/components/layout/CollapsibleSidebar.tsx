@@ -14,8 +14,8 @@ import {
   Bell,
   CreditCard,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
+  Pin,
+  PinOff,
 } from 'lucide-react'
 
 const navigation = [
@@ -32,28 +32,31 @@ const navigation = [
 
 export default function CollapsibleSidebar() {
   const pathname = usePathname()
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isPinned, setIsPinned] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
-  // Load expanded state from localStorage
+  // Load pinned state from localStorage
   useEffect(() => {
-    const expanded = localStorage.getItem('sidebar-expanded')
-    if (expanded !== null) {
-      setIsExpanded(expanded === 'true')
-    }
+    const pinned = localStorage.getItem('sidebar-pinned') === 'true'
+    setIsPinned(pinned)
   }, [])
 
-  // Handle toggle
-  const toggleSidebar = () => {
-    const newState = !isExpanded
-    setIsExpanded(newState)
-    localStorage.setItem('sidebar-expanded', String(newState))
+  // Handle pin toggle
+  const togglePin = () => {
+    const newState = !isPinned
+    setIsPinned(newState)
+    localStorage.setItem('sidebar-pinned', String(newState))
   }
+
+  const isExpanded = isPinned || isHovered
 
   return (
     <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`${
         isExpanded ? 'w-64' : 'w-20'
-      } h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out flex flex-col shadow-2xl sticky top-0 left-0`}
+      } h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out flex flex-col shadow-2xl fixed top-0 left-0 z-40`}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
       {/* Logo Section */}
@@ -68,12 +71,15 @@ export default function CollapsibleSidebar() {
             </span>
           )}
         </Link>
-        <button
-          onClick={toggleSidebar}
-          className="p-1.5 hover:bg-white/5 rounded-lg transition-colors text-white/60 hover:text-white"
-        >
-          {isExpanded ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-        </button>
+        {isExpanded && (
+          <button
+            onClick={togglePin}
+            className="p-1.5 hover:bg-white/5 rounded-lg transition-colors text-white/60 hover:text-[#D67C3C]"
+            title={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
+          >
+            {isPinned ? <Pin size={18} className="text-[#D67C3C]" /> : <PinOff size={18} />}
+          </button>
+        )}
       </div>
 
       {/* Navigation */}

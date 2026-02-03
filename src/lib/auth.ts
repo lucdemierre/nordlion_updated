@@ -1,15 +1,20 @@
-// Simple authentication utilities
+// Enhanced authentication with multiple roles
 // In production, use proper authentication like NextAuth.js
+
+export type UserRole = 'client' | 'broker' | 'admin'
 
 export interface User {
   id: string
   email: string
   firstName: string
   lastName: string
-  role: 'admin' | 'user'
+  role: UserRole
+  verified: boolean
+  profileComplete: boolean
+  twoFactorEnabled: boolean
 }
 
-// Test credentials
+// Test credentials for different roles
 const TEST_USERS = [
   {
     id: '1',
@@ -18,14 +23,31 @@ const TEST_USERS = [
     firstName: 'Admin',
     lastName: 'User',
     role: 'admin' as const,
+    verified: true,
+    profileComplete: true,
+    twoFactorEnabled: false,
   },
   {
     id: '2',
-    email: 'test@nordlionauto.com',
-    password: 'test123',
-    firstName: 'Test',
-    lastName: 'User',
-    role: 'user' as const,
+    email: 'broker@nordlionauto.com',
+    password: 'broker123',
+    firstName: 'Broker',
+    lastName: 'Agent',
+    role: 'broker' as const,
+    verified: true,
+    profileComplete: true,
+    twoFactorEnabled: false,
+  },
+  {
+    id: '3',
+    email: 'client@nordlionauto.com',
+    password: 'client123',
+    firstName: 'John',
+    lastName: 'Doe',
+    role: 'client' as const,
+    verified: false,
+    profileComplete: false,
+    twoFactorEnabled: false,
   },
 ]
 
@@ -35,7 +57,6 @@ export function validateCredentials(email: string, password: string): User | nul
   )
 
   if (user) {
-    // Return user without password
     const { password: _, ...userWithoutPassword } = user
     return userWithoutPassword
   }
@@ -46,7 +67,7 @@ export function validateCredentials(email: string, password: string): User | nul
 export function setAuthToken(user: User) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('auth_user', JSON.stringify(user))
-    localStorage.setItem('auth_token', 'test_token_' + user.id)
+    localStorage.setItem('auth_token', 'token_' + user.id + '_' + user.role)
   }
 }
 
@@ -71,6 +92,16 @@ export function getCurrentUser(): User | null {
   return null
 }
 
+export function updateCurrentUser(updates: Partial<User>) {
+  const user = getCurrentUser()
+  if (user) {
+    const updatedUser = { ...user, ...updates }
+    setAuthToken(updatedUser)
+    return updatedUser
+  }
+  return null
+}
+
 export function logout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_user')
@@ -80,4 +111,11 @@ export function logout() {
 
 export function isAuthenticated(): boolean {
   return getAuthToken() !== null
+}
+
+export function requireAuth(allowedRoles?: UserRole[]) {
+  const user = getCurrentUser()
+  if (!user) return false
+  if (allowedRoles && !allowedRoles.includes(user.role)) return false
+  return true
 }

@@ -3,11 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['localhost', 'nordlionauto.com'],
+    domains: ['localhost', 'nordlionauto.com', 'images.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
-  },
-  experimental: {
-    optimizeCss: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

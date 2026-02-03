@@ -1,38 +1,40 @@
 'use client'
 
-import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Camera, Mail, Phone, MapPin, Calendar, Shield, Edit2, Save } from 'lucide-react'
 import { useState } from 'react'
+import DashboardLayout from '@/components/layout/DashboardLayout'
+import { Camera, Mail, Phone, MapPin, Calendar, Edit2, Save } from 'lucide-react'
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
-  const [profileData, setProfileData] = useState({
-    name: 'Alexandre Rousseau',
-    email: 'alexandre.rousseau@example.com',
-    phone: '+44 20 7946 0958',
-    location: 'London, United Kingdom',
-    memberSince: 'January 2023',
-    bio: 'Passionate car enthusiast with a love for high-performance vehicles and luxury automotive experiences.',
+  const [formData, setFormData] = useState({
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Luxury Lane',
+    city: 'Monaco',
+    country: 'Monaco',
+    bio: 'Passionate automotive enthusiast and collector of exceptional vehicles.'
   })
 
   const handleSave = () => {
+    // Handle save logic
     setIsEditing(false)
-    // Here you would typically save to backend
   }
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
+      <div className="p-8 max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Profile</h1>
-            <p className="text-white/60 text-lg">Manage your personal information and preferences</p>
+            <h1 className="text-3xl font-semibold text-white mb-1">Profile</h1>
+            <p className="text-white/50 text-sm font-light">Manage your personal information</p>
           </div>
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-6 py-3 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-xl font-medium transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] rounded-xl text-white text-sm font-normal transition-colors flex items-center gap-2"
             >
               <Edit2 className="w-4 h-4" />
               Edit Profile
@@ -41,13 +43,13 @@ export default function ProfilePage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-all border border-white/10"
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-sm font-normal transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-3 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-xl font-medium transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] rounded-xl text-white text-sm font-normal transition-colors flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 Save Changes
@@ -56,174 +58,161 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Profile Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-6 space-y-6">
-              {/* Avatar */}
-              <div className="flex flex-col items-center">
-                <div className="relative group">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#32b8c6] to-[#1a6873] flex items-center justify-center text-white text-4xl font-bold">
-                    AR
-                  </div>
-                  <button className="absolute bottom-0 right-0 p-2 bg-[#32b8c6] hover:bg-[#2aa0ad] rounded-full text-white transition-all opacity-0 group-hover:opacity-100">
-                    <Camera className="w-4 h-4" />
-                  </button>
-                </div>
-                <h2 className="text-2xl font-bold text-white mt-4 text-center">{profileData.name}</h2>
-                <p className="text-white/50 text-sm">Premium Member</p>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white mb-1">12</div>
-                  <div className="text-xs text-white/50">Orders</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white mb-1">8</div>
-                  <div className="text-xs text-white/50">Wishlist</div>
-                </div>
-              </div>
-
-              {/* Member Since */}
-              <div className="pt-6 border-t border-white/5">
-                <div className="flex items-center gap-3 text-white/60">
-                  <Calendar className="w-5 h-5" />
-                  <div>
-                    <p className="text-xs text-white/40">Member Since</p>
-                    <p className="text-sm font-medium text-white">{profileData.memberSince}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Profile Card */}
+        <div className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
+          {/* Cover Photo */}
+          <div className="h-32 bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] relative">
+            {isEditing && (
+              <button className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg transition-colors">
+                <Camera className="w-4 h-4 text-white" />
+              </button>
+            )}
           </div>
 
-          {/* Information Forms */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Personal Information */}
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-              <h3 className="text-xl font-semibold text-white mb-6">Personal Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">
-                    Full Name
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={profileData.name}
-                      onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                      <span className="text-white">{profileData.name}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">
-                    Email Address
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                      <Mail className="w-5 h-5 text-white/40" />
-                      <span className="text-white">{profileData.email}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">
-                    Phone Number
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                      <Phone className="w-5 h-5 text-white/40" />
-                      <span className="text-white">{profileData.phone}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">
-                    Location
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={profileData.location}
-                      onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                      <MapPin className="w-5 h-5 text-white/40" />
-                      <span className="text-white">{profileData.location}</span>
-                    </div>
-                  )}
-                </div>
+          {/* Profile Info */}
+          <div className="px-8 pb-8">
+            {/* Avatar */}
+            <div className="relative -mt-16 mb-6">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] border-4 border-[#141414] flex items-center justify-center">
+                <span className="text-white font-bold text-4xl">JD</span>
               </div>
-            </div>
-
-            {/* Bio */}
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-              <h3 className="text-xl font-semibold text-white mb-6">About</h3>
-              {isEditing ? (
-                <textarea
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#32b8c6] transition-colors resize-none"
-                />
-              ) : (
-                <p className="text-white/60 leading-relaxed">{profileData.bio}</p>
+              {isEditing && (
+                <button className="absolute bottom-2 right-2 p-2 bg-[#D67C3C] hover:bg-[#B85A1F] rounded-full transition-colors">
+                  <Camera className="w-4 h-4 text-white" />
+                </button>
               )}
             </div>
 
-            {/* Security */}
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Shield className="w-6 h-6 text-[#32b8c6]" />
-                <h3 className="text-xl font-semibold text-white">Security</h3>
+            {/* Form */}
+            <div className="space-y-6">
+              {/* Name */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 text-sm font-normal mb-2">First Name</label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-white/70 text-sm font-normal mb-2">Last Name</label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3 px-4 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                  <div>
-                    <p className="text-white font-medium">Password</p>
-                    <p className="text-sm text-white/50">Last changed 3 months ago</p>
-                  </div>
-                  <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-all text-sm border border-white/10">
-                    Change
-                  </button>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-white/70 text-sm font-normal mb-2">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full pl-12 pr-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
                 </div>
-                <div className="flex items-center justify-between py-3 px-4 bg-[#0a0a0a] border border-white/10 rounded-xl">
-                  <div>
-                    <p className="text-white font-medium">Two-Factor Authentication</p>
-                    <p className="text-sm text-white/50">Add an extra layer of security</p>
-                  </div>
-                  <button className="px-4 py-2 bg-[#32b8c6] hover:bg-[#2aa0ad] text-white rounded-lg font-medium transition-all text-sm">
-                    Enable
-                  </button>
+              </div>
+
+              <div>
+                <label className="block text-white/70 text-sm font-normal mb-2">Phone</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full pl-12 pr-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
                 </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-white/70 text-sm font-normal mb-2">Address</label>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full pl-12 pr-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 text-sm font-normal mb-2">City</label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-white/70 text-sm font-normal mb-2">Country</label>
+                  <input
+                    type="text"
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="block text-white/70 text-sm font-normal mb-2">Bio</label>
+                <textarea
+                  value={formData.bio}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  disabled={!isEditing}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+                />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Account Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Calendar className="w-5 h-5 text-[#D67C3C]" />
+              <span className="text-white/60 text-sm font-light">Member Since</span>
+            </div>
+            <p className="text-white font-semibold">January 2024</p>
+          </div>
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Calendar className="w-5 h-5 text-[#D67C3C]" />
+              <span className="text-white/60 text-sm font-light">Total Orders</span>
+            </div>
+            <p className="text-white font-semibold">5</p>
+          </div>
+          <div className="bg-[#141414] rounded-xl border border-white/5 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Calendar className="w-5 h-5 text-[#D67C3C]" />
+              <span className="text-white/60 text-sm font-light">Total Spent</span>
+            </div>
+            <p className="text-white font-semibold">$1,502,000</p>
           </div>
         </div>
       </div>

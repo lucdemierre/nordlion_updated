@@ -115,16 +115,16 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="p-8 space-y-8">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-white/60 text-lg">Here's an overview of your activity</p>
+            <h1 className="text-3xl font-semibold text-white mb-1">Welcome Back</h1>
+            <p className="text-white/50 text-sm font-light">Here’s an overview of your activity</p>
           </div>
           <div className="text-right">
-            <p className="text-white/40 text-sm">Last login</p>
-            <p className="text-white font-medium">Today at 9:42 AM</p>
+            <p className="text-white/40 text-xs font-light">Last login</p>
+            <p className="text-white text-sm font-normal">Today at 9:42 AM</p>
           </div>
         </div>
 
@@ -145,11 +145,11 @@ export default function DashboardPage() {
               >
                 <div className="p-6">
                   <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${stat.color} mb-4`}>
-                    <Icon className={`${stat.iconColor} w-6 h-6`} />
+                    <Icon className={`${stat.iconColor} w-5 h-5`} />
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-sm text-white/50 mb-2">{stat.name}</div>
-                  <div className="text-xs text-[#32b8c6]">{stat.change}</div>
+                  <div className="text-3xl font-semibold text-white mb-1">{stat.value}</div>
+                  <div className="text-sm text-white/50 font-light">{stat.name}</div>
+                  <div className="text-xs text-[#32b8c6] mt-2 font-normal">{stat.change}</div>
                 </div>
               </DraggableWidget>
             )
@@ -170,8 +170,8 @@ export default function DashboardPage() {
             <div className="overflow-hidden">
               <div className="p-6 border-b border-white/5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-white">Recent Orders</h3>
-                  <button className="text-[#32b8c6] hover:text-[#2aa0ad] text-sm font-medium transition-colors">
+                  <h3 className="text-lg font-medium text-white">Recent Orders</h3>
+                  <button className="text-[#32b8c6] hover:text-[#2aa0ad] text-sm font-normal transition-colors">
                     View All
                   </button>
                 </div>
@@ -190,17 +190,17 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-white font-medium mb-1 truncate">{order.vehicle}</h4>
-                      <p className="text-sm text-white/50">
+                      <h4 className="text-white font-normal mb-1 truncate">{order.vehicle}</h4>
+                      <p className="text-xs text-white/40 font-light">
                         Order {order.id} • {order.date}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-white font-bold mb-2">
+                      <div className="text-white font-semibold text-sm mb-2">
                         ${order.amount.toLocaleString()}
                       </div>
                       <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                        className={`inline-block px-2.5 py-1 rounded-full text-xs font-normal ${
                           order.status === 'Delivered'
                             ? 'bg-green-500/10 text-green-400 border border-green-500/20'
                             : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
@@ -239,16 +239,16 @@ export default function DashboardPage() {
                         ? 'from-[#32b8c6]/10 to-[#1a6873]/10' 
                         : 'from-purple-500/10 to-purple-600/10'
                     } rounded-xl`}>
-                      <Icon className={`w-6 h-6 ${
+                      <Icon className={`w-5 h-5 ${
                         action.iconColor || 'text-[#32b8c6]'
                       }`} />
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{action.title}</h3>
-                  <p className="text-white/60 mb-4 text-sm">
+                  <h3 className="text-base font-medium text-white mb-2">{action.title}</h3>
+                  <p className="text-white/50 mb-4 text-sm font-light">
                     {action.description}
                   </p>
-                  <button className={`w-full py-3 px-4 rounded-xl font-medium transition-all ${
+                  <button className={`w-full py-2.5 px-4 rounded-xl text-sm font-normal transition-all ${
                     isPrimary
                       ? 'bg-[#32b8c6] hover:bg-[#2aa0ad] text-white'
                       : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'

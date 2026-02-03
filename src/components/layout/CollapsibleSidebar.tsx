@@ -73,14 +73,14 @@ export default function CollapsibleSidebar() {
 
   return (
     <aside
-      className={`${sidebarWidth} fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out z-[100] flex flex-col shadow-xl`}
+      className={`${sidebarWidth} fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-white/5 transition-all duration-300 ease-in-out z-[100] flex flex-col shadow-2xl`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
       {/* Logo Section */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-white/5 flex-shrink-0">
-        <Link href="/dashboard" className="flex items-center space-x-3 overflow-hidden">
+      <div className="h-16 flex items-center px-4 border-b border-white/5 flex-shrink-0 overflow-hidden">
+        <Link href="/dashboard" className="flex items-center space-x-3 min-w-0 flex-1">
           <div className="w-8 h-8 bg-gradient-to-br from-[#32b8c6] to-[#1a6873] rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">NL</span>
           </div>
@@ -88,15 +88,20 @@ export default function CollapsibleSidebar() {
             className={`text-white font-semibold text-lg whitespace-nowrap transition-all duration-300 ${
               isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
             }`}
-            style={{ transitionDelay: isExpanded ? '150ms' : '0ms' }}
+            style={{ 
+              transitionDelay: isExpanded ? '150ms' : '0ms',
+              minWidth: isExpanded ? 'auto' : '0',
+              width: isExpanded ? 'auto' : '0',
+              overflow: 'hidden'
+            }}
           >
             NordLion
           </span>
         </Link>
         <button
           onClick={togglePin}
-          className={`p-1.5 hover:bg-white/5 rounded-lg transition-all duration-300 flex-shrink-0 ${
-            isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'
+          className={`p-1.5 hover:bg-white/5 rounded-lg transition-all duration-300 flex-shrink-0 ml-auto ${
+            isExpanded ? 'opacity-100 translate-x-0 visible' : 'opacity-0 translate-x-4 invisible'
           }`}
           style={{ transitionDelay: isExpanded ? '150ms' : '0ms' }}
           aria-label={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
@@ -178,7 +183,7 @@ export default function CollapsibleSidebar() {
         </button>
       </div>
 
-      {/* Expand Button - Fixed positioning */}
+      {/* Expand Button - Positioned further right to avoid overlap */}
       {!isHovering && !isPinned && (
         <button
           onClick={() => {
@@ -186,8 +191,8 @@ export default function CollapsibleSidebar() {
             setIsExpanded(true)
             localStorage.setItem('sidebar-pinned', 'true')
           }}
-          className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] transition-all duration-200 z-[110] shadow-lg"
-          style={{ left: '76px' }}
+          className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-[#32b8c6] rounded-full flex items-center justify-center text-white hover:bg-[#2aa0ad] transition-all duration-200 z-[110] shadow-lg hover:shadow-xl"
+          style={{ left: '84px' }}
           aria-label="Expand sidebar"
         >
           <ChevronRight className="w-3 h-3" />

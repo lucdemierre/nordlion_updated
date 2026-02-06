@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
-import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Search, Filter, Plus, Edit, Trash2, Mail, Shield, CheckCircle, XCircle, MoreVertical } from 'lucide-react'
+import { getCurrentUser, canAccessDashboard, logout } from '@/lib/auth'
+import { Search, Filter, Plus, Edit, Trash2, Mail, Shield, CheckCircle, XCircle, MoreVertical, LogOut, Home } from 'lucide-react'
+import Link from 'next/link'
 
 interface User {
   id: string
@@ -33,6 +33,11 @@ export default function AdminUsers() {
     }
     setUser(currentUser)
   }, [router])
+
+  const handleLogout = () => {
+    logout()
+    router.push('/auth/login')
+  }
 
   const users: User[] = [
     { id: '1', name: 'John Smith', email: 'john@example.com', role: 'client', status: 'active', verified: true, joinDate: 'Jan 15, 2026', lastActive: '2 hours ago', orders: 3, spent: 845000 },
@@ -67,18 +72,32 @@ export default function AdminUsers() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
+    <div className="min-h-screen bg-[#0f0f0f]">
       <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-light text-white">User Management</h1>
-              <p className="text-sm text-white/50 font-light mt-1">{users.length} total users</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Link href="/admin" className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                <Home size={20} className="text-white/60" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-white">User Management</h1>
+                <p className="text-sm text-white/50 font-light mt-1">{users.length} total users</p>
+              </div>
             </div>
-            <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-              <Plus size={16} />
-              Add User
-            </button>
+            <div className="flex items-center gap-2">
+              <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                <Plus size={16} />
+                Add User
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors flex items-center gap-2 text-red-400 font-medium"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -202,8 +221,6 @@ export default function AdminUsers() {
           </div>
         </div>
       </main>
-
-      <BottomNav />
     </div>
   )
 }

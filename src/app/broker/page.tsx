@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
+import Sidebar from '@/components/Sidebar'
 import DraggableWidget from '@/components/DraggableWidget'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Users, Package, TrendingUp, DollarSign, Target, Award } from 'lucide-react'
+import { Users, Package, DollarSign, TrendingUp } from 'lucide-react'
 
 export default function BrokerDashboard() {
   const router = useRouter()
@@ -35,151 +35,98 @@ export default function BrokerDashboard() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
-      <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-light text-white mb-1">
-                Welcome back, {user.firstName}
-              </h1>
-              <p className="text-sm text-white/50 font-light">Broker Dashboard</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="px-4 py-2 bg-[#D67C3C]/10 rounded-lg border border-[#D67C3C]/20">
-                <p className="text-xs text-white/50 font-light">Commission This Month</p>
-                <p className="text-lg text-[#D67C3C] font-medium">$45,200</p>
-              </div>
-            </div>
+    <div className="flex h-screen bg-[#0f0f0f]">
+      <Sidebar role="broker" />
+      
+      <div className="flex-1 ml-16 overflow-auto">
+        <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-6 py-6">
+            <h1 className="text-2xl font-light text-white mb-1">
+              Welcome back, {user.firstName}
+            </h1>
+            <p className="text-sm text-white/50 font-light">Your broker dashboard</p>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#141414] border border-white/5 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#D67C3C]/10 flex items-center justify-center">
-                <Users size={20} className="text-[#D67C3C]" />
-              </div>
-            </div>
-            <p className="text-2xl font-light text-white mb-1">24</p>
-            <p className="text-sm text-white/50 font-light">Active Clients</p>
-          </div>
-
-          <div className="bg-[#141414] border border-white/5 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Package size={20} className="text-blue-400" />
-              </div>
-            </div>
-            <p className="text-2xl font-light text-white mb-1">12</p>
-            <p className="text-sm text-white/50 font-light">Active Deals</p>
-          </div>
-
-          <div className="bg-[#141414] border border-white/5 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <TrendingUp size={20} className="text-green-400" />
-              </div>
-            </div>
-            <p className="text-2xl font-light text-white mb-1">$2.1M</p>
-            <p className="text-sm text-white/50 font-light">Sales This Month</p>
-          </div>
-
-          <div className="bg-[#141414] border border-white/5 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <Award size={20} className="text-purple-400" />
-              </div>
-            </div>
-            <p className="text-2xl font-light text-white mb-1">95%</p>
-            <p className="text-sm text-white/50 font-light">Success Rate</p>
-          </div>
-        </div>
-
-        {/* Draggable Widgets */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <DraggableWidget
-            id="active-deals"
-            title="Active Deals Pipeline"
-            initialPosition={widgetPositions['active-deals']}
-            onPositionChange={handleWidgetMove}
-          >
-            <div className="space-y-3">
-              {[
-                { client: 'John Smith', vehicle: 'Ferrari SF90', value: '$625K', stage: 'Negotiation' },
-                { client: 'Emma Wilson', vehicle: 'Porsche GT3 RS', value: '$289K', stage: 'Contract' },
-                { client: 'Michael Brown', vehicle: 'Lamborghini Huracán', value: '$345K', stage: 'Deposit' },
-              ].map((deal, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg">
-                  <div>
-                    <p className="text-sm text-white font-medium">{deal.client}</p>
-                    <p className="text-xs text-white/40 font-light mt-1">{deal.vehicle}</p>
+        <main className="max-w-7xl mx-auto px-6 py-8">
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { icon: Users, label: 'Active Clients', value: '24', color: 'bg-[#D67C3C]' },
+              { icon: Package, label: 'Inventory', value: '156', color: 'bg-blue-500' },
+              { icon: DollarSign, label: 'Commission', value: '$145K', color: 'bg-green-500' },
+              { icon: TrendingUp, label: 'Sales', value: '18', color: 'bg-purple-500' },
+            ].map((stat, i) => {
+              const Icon = stat.icon
+              return (
+                <div key={i} className="bg-[#141414] border border-white/5 rounded-xl p-6">
+                  <div className={`w-10 h-10 rounded-lg ${stat.color}/10 flex items-center justify-center mb-4`}>
+                    <Icon size={20} className={stat.color.replace('bg-', 'text-')} />
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-[#D67C3C] font-medium">{deal.value}</p>
-                    <span className="text-xs text-white/40">{deal.stage}</span>
-                  </div>
+                  <p className="text-2xl font-light text-white mb-1">{stat.value}</p>
+                  <p className="text-sm text-white/50 font-light">{stat.label}</p>
                 </div>
-              ))}
-            </div>
-          </DraggableWidget>
+              )
+            })}
+          </div>
 
-          <DraggableWidget
-            id="top-clients"
-            title="Top Clients"
-            initialPosition={widgetPositions['top-clients']}
-            onPositionChange={handleWidgetMove}
-          >
-            <div className="space-y-3">
-              {[
-                { name: 'David Miller', spent: '$1.2M', vehicles: 4 },
-                { name: 'Sarah Johnson', spent: '$890K', vehicles: 3 },
-                { name: 'Robert Garcia', spent: '$765K', vehicles: 2 },
-              ].map((client, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white text-sm font-medium">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DraggableWidget
+              id="broker-performance"
+              title="Performance Overview"
+              initialPosition={widgetPositions['broker-performance']}
+              onPositionChange={handleWidgetMove}
+            >
+              <div className="space-y-4">
+                {[
+                  { label: 'Sales Target', value: 18, total: 25, color: 'bg-[#D67C3C]' },
+                  { label: 'Client Satisfaction', value: 94, total: 100, color: 'bg-green-500' },
+                  { label: 'Response Time', value: 85, total: 100, color: 'bg-blue-500' },
+                ].map((stat, i) => {
+                  const percentage = (stat.value / stat.total) * 100
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-white/70 font-light">{stat.label}</span>
+                        <span className="text-sm text-white font-medium">{stat.value}/{stat.total}</span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div className={`h-full ${stat.color} rounded-full`} style={{ width: `${percentage}%` }}></div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </DraggableWidget>
+
+            <DraggableWidget
+              id="recent-clients"
+              title="Recent Client Activity"
+              initialPosition={widgetPositions['recent-clients']}
+              onPositionChange={handleWidgetMove}
+            >
+              <div className="space-y-3">
+                {[
+                  { name: 'John Smith', action: 'Purchased Ferrari SF90', time: '2h ago' },
+                  { name: 'Emma Wilson', action: 'Viewing Porsche 911', time: '5h ago' },
+                  { name: 'Michael Brown', action: 'Requested quote', time: '1d ago' },
+                ].map((client, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white text-xs font-medium">
                       {client.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    <div>
-                      <p className="text-sm text-white font-medium">{client.name}</p>
-                      <p className="text-xs text-white/40 font-light">{client.vehicles} vehicles</p>
+                    <div className="flex-1">
+                      <p className="text-sm text-white">{client.name}</p>
+                      <p className="text-xs text-white/40 font-light mt-1">{client.action}</p>
                     </div>
+                    <span className="text-xs text-white/30 font-light">{client.time}</span>
                   </div>
-                  <p className="text-sm text-[#D67C3C] font-medium">{client.spent}</p>
-                </div>
-              ))}
-            </div>
-          </DraggableWidget>
-        </div>
-
-        {/* Commission Breakdown */}
-        <DraggableWidget
-          id="commission"
-          title="Commission Breakdown"
-          initialPosition={widgetPositions['commission']}
-          onPositionChange={handleWidgetMove}
-        >
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { label: 'Pending', amount: '$28,500', color: 'bg-yellow-500' },
-              { label: 'Approved', amount: '$45,200', color: 'bg-green-500' },
-              { label: 'Paid', amount: '$125,000', color: 'bg-[#D67C3C]' },
-            ].map((item, i) => (
-              <div key={i} className="p-4 bg-[#0a0a0a] rounded-lg">
-                <div className={`w-8 h-1 ${item.color} rounded-full mb-3`}></div>
-                <p className="text-white/40 text-xs font-light mb-1">{item.label}</p>
-                <p className="text-xl font-light text-white">{item.amount}</p>
+                ))}
               </div>
-            ))}
+            </DraggableWidget>
           </div>
-        </DraggableWidget>
-      </main>
-
-      <BottomNav />
+        </main>
+      </div>
     </div>
   )
 }

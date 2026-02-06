@@ -4,94 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
+import { messageStore, type Message, type Conversation } from '@/lib/messageStore'
 import { Search, Send, Paperclip, Phone, Video, MoreVertical } from 'lucide-react'
-
-interface Message {
-  id: string
-  text: string
-  sender: 'me' | 'other'
-  time: string
-}
-
-interface Conversation {
-  id: string
-  name: string
-  avatar: string
-  lastMessage: string
-  time: string
-  unread: number
-  online: boolean
-  messages: Message[]
-}
 
 export default function ClientMessages() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [messageInput, setMessageInput] = useState('')
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: '1',
-      name: 'Sarah - Broker',
-      avatar: 'SB',
-      lastMessage: 'Your Porsche 911 GT3 RS is ready for delivery!',
-      time: '2m ago',
-      unread: 2,
-      online: true,
-      messages: [
-        { id: '1', text: 'Hello! I have an update on your order.', sender: 'other', time: '10:30 AM' },
-        { id: '2', text: 'Great! What\'s the news?', sender: 'me', time: '10:32 AM' },
-        { id: '3', text: 'Your Porsche 911 GT3 RS has cleared customs and is ready for delivery!', sender: 'other', time: '10:33 AM' },
-        { id: '4', text: 'That\'s fantastic! When can I expect it?', sender: 'me', time: '10:35 AM' },
-        { id: '5', text: 'We can arrange delivery for tomorrow afternoon. Does 2 PM work for you?', sender: 'other', time: '10:36 AM' },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Support Team',
-      avatar: 'ST',
-      lastMessage: 'We\'ve processed your document request',
-      time: '1h ago',
-      unread: 0,
-      online: false,
-      messages: [
-        { id: '1', text: 'Hi, how can I help you today?', sender: 'other', time: '9:00 AM' },
-        { id: '2', text: 'I need a copy of my purchase agreement', sender: 'me', time: '9:05 AM' },
-        { id: '3', text: 'I\'ll get that for you right away.', sender: 'other', time: '9:06 AM' },
-        { id: '4', text: 'We\'ve processed your document request. Check your Documents section.', sender: 'other', time: '9:15 AM' },
-      ],
-    },
-    {
-      id: '3',
-      name: 'John - Sales',
-      avatar: 'JS',
-      lastMessage: 'I found a Ferrari SF90 that matches your criteria',
-      time: '3h ago',
-      unread: 1,
-      online: true,
-      messages: [
-        { id: '1', text: 'Good morning! I have something exciting to show you.', sender: 'other', time: '7:30 AM' },
-        { id: '2', text: 'What is it?', sender: 'me', time: '7:45 AM' },
-        { id: '3', text: 'I found a Ferrari SF90 that matches your criteria - low mileage, perfect condition', sender: 'other', time: '7:46 AM' },
-        { id: '4', text: 'The price is $625,000. Interested?', sender: 'other', time: '7:47 AM' },
-      ],
-    },
-    {
-      id: '4',
-      name: 'Emma - Finance',
-      avatar: 'EF',
-      lastMessage: 'Your financing has been approved',
-      time: 'Yesterday',
-      unread: 0,
-      online: false,
-      messages: [
-        { id: '1', text: 'Good news about your financing application!', sender: 'other', time: 'Yesterday 4:00 PM' },
-        { id: '2', text: 'Tell me more!', sender: 'me', time: 'Yesterday 4:05 PM' },
-        { id: '3', text: 'Your financing has been approved for up to $1.5M at 3.2% APR', sender: 'other', time: 'Yesterday 4:06 PM' },
-        { id: '4', text: 'That\'s excellent! Thank you!', sender: 'me', time: 'Yesterday 4:10 PM' },
-      ],
-    },
-  ])
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -101,48 +23,79 @@ export default function ClientMessages() {
     }
     setUser(currentUser)
     
+    // Load conversations
+    const convos = messageStore.getConversations('client')
+    setConversations(convos)
+    
     // Set default conversation
-    if (conversations.length > 0 && !selectedConversation) {
-      setSelectedConversation(conversations[0].id)
+    if (convos.length > 0 && !selectedConversation) {
+      setSelectedConversation(convos[0].id)
+      setMessages(messageStore.getMessages(convos[0].id))
+      // Mark as read when opening
+      messageStore.markAsRead(convos[0].id)
     }
   }, [router])
+
+  useEffect(() => {
+    if (selectedConversation) {
+      const msgs = messageStore.getMessages(selectedConversation)
+      setMessages(msgs)
+      
+      // Mark as read when selecting conversation
+      messageStore.markAsRead(selectedConversation)
+      
+      // Update conversations to reflect unread count
+      const updatedConvos = messageStore.getConversations('client')
+      setConversations(updatedConvos)
+      
+      // Scroll to bottom
+      setTimeout(() => {
+        const container = document.querySelector('.messages-container')
+        if (container) {
+          container.scrollTop = container.scrollHeight
+        }
+      }, 100)
+    }
+  }, [selectedConversation])
 
   const activeConversation = conversations.find(c => c.id === selectedConversation)
 
   const handleSendMessage = () => {
-    if (messageInput.trim() && activeConversation) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
+    if (messageInput.trim() && selectedConversation) {
+      // Add message to store
+      messageStore.addMessage(selectedConversation, {
+        conversationId: selectedConversation,
         text: messageInput.trim(),
         sender: 'me',
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      }
+        senderName: 'You',
+        timestamp: new Date(),
+        read: true,
+      })
 
-      // Update conversations state
-      setConversations(prevConversations => 
-        prevConversations.map(conv => {
-          if (conv.id === selectedConversation) {
-            return {
-              ...conv,
-              messages: [...conv.messages, newMessage],
-              lastMessage: newMessage.text,
-              time: 'Just now',
-            }
-          }
-          return conv
-        })
-      )
+      // Refresh messages and conversations
+      const updatedMessages = messageStore.getMessages(selectedConversation)
+      setMessages(updatedMessages)
+      
+      const updatedConvos = messageStore.getConversations('client')
+      setConversations(updatedConvos)
 
       setMessageInput('')
       
       // Scroll to bottom
       setTimeout(() => {
-        const messagesContainer = document.querySelector('.messages-container')
-        if (messagesContainer) {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight
+        const container = document.querySelector('.messages-container')
+        if (container) {
+          container.scrollTop = container.scrollHeight
         }
       }, 100)
     }
+  }
+
+  const formatTime = (timestamp: Date) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit' 
+    })
   }
 
   if (!user) return null
@@ -154,7 +107,6 @@ export default function ClientMessages() {
       <div className="flex-1 flex ml-16">
         {/* Conversations List */}
         <div className="w-80 border-r border-white/5 bg-[#0a0a0a] flex flex-col">
-          {/* Search */}
           <div className="p-4 border-b border-white/5">
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
@@ -166,7 +118,6 @@ export default function ClientMessages() {
             </div>
           </div>
 
-          {/* Conversation List */}
           <div className="flex-1 overflow-y-auto">
             {conversations.map((conversation) => (
               <button
@@ -204,7 +155,6 @@ export default function ClientMessages() {
         {/* Chat Area */}
         {activeConversation ? (
           <div className="flex-1 flex flex-col">
-            {/* Chat Header */}
             <div className="h-16 px-6 border-b border-white/5 flex items-center justify-between bg-[#0a0a0a]">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -235,9 +185,8 @@ export default function ClientMessages() {
               </div>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4 messages-container">
-              {activeConversation.messages.map((message) => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
@@ -246,13 +195,12 @@ export default function ClientMessages() {
                     message.sender === 'me' ? 'bg-[#D67C3C]' : 'bg-[#141414]'
                   } rounded-lg px-4 py-3`}>
                     <p className="text-sm text-white font-light">{message.text}</p>
-                    <span className="text-xs text-white/40 font-light mt-1 block">{message.time}</span>
+                    <span className="text-xs text-white/40 font-light mt-1 block">{formatTime(message.timestamp)}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Message Input */}
             <div className="p-4 border-t border-white/5 bg-[#0a0a0a]">
               <div className="flex items-center gap-3">
                 <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">

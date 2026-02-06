@@ -9,8 +9,8 @@ import {
   MessageSquare,
   FileText,
   User,
-  Search,
-  Bell,
+  Users,
+  BarChart,
 } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth'
 import type { UserRole } from '@/lib/auth'
@@ -24,16 +24,16 @@ const clientNav = [
 
 const brokerNav = [
   { label: 'Dashboard', href: '/broker', icon: LayoutDashboard },
-  { label: 'Clients', href: '/broker/clients', icon: User },
+  { label: 'Clients', href: '/broker/clients', icon: Users },
   { label: 'Inventory', href: '/broker/inventory', icon: Package },
   { label: 'Messages', href: '/broker/messages', icon: MessageSquare },
 ]
 
 const adminNav = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { label: 'Users', href: '/admin/users', icon: User },
+  { label: 'Users', href: '/admin/users', icon: Users },
   { label: 'Vehicles', href: '/admin/vehicles', icon: Package },
-  { label: 'Reports', href: '/admin/reports', icon: FileText },
+  { label: 'Reports', href: '/admin/reports', icon: BarChart },
 ]
 
 export default function BottomNav() {

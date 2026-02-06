@@ -4,94 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
+import { messageStore, type Message, type Conversation } from '@/lib/messageStore'
 import { Search, Send, Paperclip, Phone, Video, MoreVertical } from 'lucide-react'
-
-interface Message {
-  id: string
-  text: string
-  sender: 'me' | 'other'
-  time: string
-}
-
-interface Conversation {
-  id: string
-  name: string
-  avatar: string
-  lastMessage: string
-  time: string
-  unread: number
-  online: boolean
-  messages: Message[]
-}
 
 export default function BrokerMessages() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [messageInput, setMessageInput] = useState('')
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: '1',
-      name: 'John Smith',
-      avatar: 'JS',
-      lastMessage: 'When can I view the Porsche?',
-      time: '5m ago',
-      unread: 3,
-      online: true,
-      messages: [
-        { id: '1', text: 'Hi, I\'m interested in the Porsche 911 GT3 RS', sender: 'other', time: '2:30 PM' },
-        { id: '2', text: 'Great choice! It\'s an amazing vehicle. When would you like to schedule a viewing?', sender: 'me', time: '2:32 PM' },
-        { id: '3', text: 'How about this weekend?', sender: 'other', time: '2:35 PM' },
-        { id: '4', text: 'Saturday at 2 PM works perfectly. I\'ll arrange everything.', sender: 'me', time: '2:36 PM' },
-        { id: '5', text: 'When can I view the Porsche?', sender: 'other', time: '2:40 PM' },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Emma Wilson',
-      avatar: 'EW',
-      lastMessage: 'Thanks for the quote!',
-      time: '1h ago',
-      unread: 0,
-      online: false,
-      messages: [
-        { id: '1', text: 'Can you send me a quote for the Ferrari SF90?', sender: 'other', time: '1:00 PM' },
-        { id: '2', text: 'Absolutely! The Ferrari SF90 is priced at $625,000. Would you like financing options?', sender: 'me', time: '1:05 PM' },
-        { id: '3', text: 'Yes, please send me the financing details.', sender: 'other', time: '1:10 PM' },
-        { id: '4', text: 'I\'ve sent the complete package to your email. Check it out!', sender: 'me', time: '1:15 PM' },
-        { id: '5', text: 'Thanks for the quote!', sender: 'other', time: '1:20 PM' },
-      ],
-    },
-    {
-      id: '3',
-      name: 'Michael Brown',
-      avatar: 'MB',
-      lastMessage: 'Looking for a Lamborghini',
-      time: '3h ago',
-      unread: 2,
-      online: true,
-      messages: [
-        { id: '1', text: 'Do you have any Lamborghinis in stock?', sender: 'other', time: '11:30 AM' },
-        { id: '2', text: 'We have a stunning Aventador SVJ available!', sender: 'me', time: '11:35 AM' },
-        { id: '3', text: 'Looking for a Lamborghini', sender: 'other', time: '11:40 AM' },
-      ],
-    },
-    {
-      id: '4',
-      name: 'Sarah Johnson',
-      avatar: 'SJ',
-      lastMessage: 'Confirmed the delivery',
-      time: 'Yesterday',
-      unread: 0,
-      online: false,
-      messages: [
-        { id: '1', text: 'Is my McLaren ready for delivery?', sender: 'other', time: 'Yesterday 4:00 PM' },
-        { id: '2', text: 'Yes! We can deliver it tomorrow morning.', sender: 'me', time: 'Yesterday 4:05 PM' },
-        { id: '3', text: 'Perfect! 10 AM works for me.', sender: 'other', time: 'Yesterday 4:10 PM' },
-        { id: '4', text: 'Confirmed the delivery', sender: 'other', time: 'Yesterday 4:15 PM' },
-      ],
-    },
-  ])
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -101,45 +23,72 @@ export default function BrokerMessages() {
     }
     setUser(currentUser)
     
-    if (conversations.length > 0 && !selectedConversation) {
-      setSelectedConversation(conversations[0].id)
+    // Load conversations
+    const convos = messageStore.getConversations('broker')
+    setConversations(convos)
+    
+    // Set default conversation
+    if (convos.length > 0 && !selectedConversation) {
+      setSelectedConversation(convos[0].id)
+      setMessages(messageStore.getMessages(convos[0].id))
+      messageStore.markAsRead(convos[0].id)
     }
   }, [router])
+
+  useEffect(() => {
+    if (selectedConversation) {
+      const msgs = messageStore.getMessages(selectedConversation)
+      setMessages(msgs)
+      
+      // Mark as read and update conversations
+      messageStore.markAsRead(selectedConversation)
+      const updatedConvos = messageStore.getConversations('broker')
+      setConversations(updatedConvos)
+      
+      setTimeout(() => {
+        const container = document.querySelector('.messages-container')
+        if (container) {
+          container.scrollTop = container.scrollHeight
+        }
+      }, 100)
+    }
+  }, [selectedConversation])
 
   const activeConversation = conversations.find(c => c.id === selectedConversation)
 
   const handleSendMessage = () => {
-    if (messageInput.trim() && activeConversation) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
+    if (messageInput.trim() && selectedConversation) {
+      messageStore.addMessage(selectedConversation, {
+        conversationId: selectedConversation,
         text: messageInput.trim(),
         sender: 'me',
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      }
+        senderName: 'You',
+        timestamp: new Date(),
+        read: true,
+      })
 
-      setConversations(prevConversations => 
-        prevConversations.map(conv => {
-          if (conv.id === selectedConversation) {
-            return {
-              ...conv,
-              messages: [...conv.messages, newMessage],
-              lastMessage: newMessage.text,
-              time: 'Just now',
-            }
-          }
-          return conv
-        })
-      )
+      const updatedMessages = messageStore.getMessages(selectedConversation)
+      setMessages(updatedMessages)
+      
+      const updatedConvos = messageStore.getConversations('broker')
+      setConversations(updatedConvos)
 
       setMessageInput('')
       
       setTimeout(() => {
-        const messagesContainer = document.querySelector('.messages-container')
-        if (messagesContainer) {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight
+        const container = document.querySelector('.messages-container')
+        if (container) {
+          container.scrollTop = container.scrollHeight
         }
       }, 100)
     }
+  }
+
+  const formatTime = (timestamp: Date) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit' 
+    })
   }
 
   if (!user) return null
@@ -228,7 +177,7 @@ export default function BrokerMessages() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-4 messages-container">
-              {activeConversation.messages.map((message) => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
@@ -237,7 +186,7 @@ export default function BrokerMessages() {
                     message.sender === 'me' ? 'bg-[#D67C3C]' : 'bg-[#141414]'
                   } rounded-lg px-4 py-3`}>
                     <p className="text-sm text-white font-light">{message.text}</p>
-                    <span className="text-xs text-white/40 font-light mt-1 block">{message.time}</span>
+                    <span className="text-xs text-white/40 font-light mt-1 block">{formatTime(message.timestamp)}</span>
                   </div>
                 </div>
               ))}

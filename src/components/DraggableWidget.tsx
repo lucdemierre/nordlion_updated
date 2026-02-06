@@ -20,51 +20,40 @@ export default function DraggableWidget({
 }: DraggableWidgetProps) {
   const [position, setPosition] = useState(initialPosition)
   const [isDragging, setIsDragging] = useState(false)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [initialPos, setInitialPos] = useState({ x: 0, y: 0 })
   const widgetRef = useRef<HTMLDivElement>(null)
 
   const GRID_SIZE = 300 // Snap grid size
-  const COLUMN_WIDTH = 600 // Widget column width
 
+  // Snap to grid function
   const snapToGrid = (x: number, y: number) => {
-    const snappedX = Math.round(x / COLUMN_WIDTH) * COLUMN_WIDTH
+    const snappedX = Math.round(x / GRID_SIZE) * GRID_SIZE
     const snappedY = Math.round(y / GRID_SIZE) * GRID_SIZE
     return { x: Math.max(0, snappedX), y: Math.max(0, snappedY) }
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!widgetRef.current) return
-    
-    const rect = widgetRef.current.getBoundingClientRect()
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    })
+
     setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+    setInitialPos(position)
     e.preventDefault()
   }
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !widgetRef.current) return
+      if (!isDragging) return
 
-      const container = widgetRef.current.parentElement
-      if (!container) return
+      const deltaX = e.clientX - dragStart.x
+      const deltaY = e.clientY - dragStart.y
 
-      const containerRect = container.getBoundingClientRect()
-      
-      // Calculate position relative to container, accounting for offset
-      let newX = e.clientX - containerRect.left - dragOffset.x
-      let newY = e.clientY - containerRect.top - dragOffset.y
-
-      // Constrain to container bounds
-      const maxX = containerRect.width - widgetRef.current.offsetWidth
-      const maxY = containerRect.height - widgetRef.current.offsetHeight
-      
-      newX = Math.max(0, Math.min(newX, maxX))
-      newY = Math.max(0, Math.min(newY, maxY))
-
-      setPosition({ x: newX, y: newY })
+      // Update position with deltas
+      setPosition({
+        x: Math.max(0, initialPos.x + deltaX),
+        y: Math.max(0, initialPos.y + deltaY),
+      })
     }
 
     const handleMouseUp = () => {
@@ -88,19 +77,19 @@ export default function DraggableWidget({
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [isDragging, position, dragOffset, id, onPositionChange])
+  }, [isDragging, position, dragStart, initialPos, id, onPositionChange])
 
   return (
     <div
       ref={widgetRef}
-      className={`bg-[#141414] border border-white/5 rounded-xl overflow-hidden transition-shadow ${
-        isDragging ? 'shadow-2xl shadow-[#D67C3C]/20 cursor-grabbing' : ''
+      className={`bg-[#141414] border border-white/5 rounded-xl overflow-hidden transition-all duration-200 ${
+        isDragging ? 'shadow-2xl shadow-[#D67C3C]/30 scale-[0.98]' : ''
       }`}
       style={{
-        position: position.x !== 0 || position.y !== 0 ? 'absolute' : 'relative',
-        left: position.x !== 0 || position.y !== 0 ? `${position.x}px` : undefined,
-        top: position.x !== 0 || position.y !== 0 ? `${position.y}px` : undefined,
-        zIndex: isDragging ? 50 : 1,
+        position: 'relative',
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        zIndex: isDragging ? 1000 : 1,
+        cursor: isDragging ? 'grabbing' : 'auto',
       }}
     >
       <div className="flex items-center justify-between p-4 border-b border-white/5 bg-[#0a0a0a]">
@@ -108,6 +97,7 @@ export default function DraggableWidget({
         <button
           onMouseDown={handleMouseDown}
           className="cursor-grab active:cursor-grabbing p-1 hover:bg-white/5 rounded transition-colors"
+          style={{ zIndex: 1001 }}
         >
           <GripVertical size={16} className="text-white/40" />
         </button>

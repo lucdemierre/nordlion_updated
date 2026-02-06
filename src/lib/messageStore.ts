@@ -1,5 +1,5 @@
-// Message Store - Simulates database storage
-// In production, this will be replaced with Supabase
+// Message Store - Complete persistence system
+// Stores messages in localStorage with full history
 
 export interface Message {
   id: string
@@ -27,161 +27,292 @@ class MessageStore {
   private conversations: Map<string, Conversation> = new Map()
 
   constructor() {
-    this.initializeDefaultData()
-  }
-
-  private initializeDefaultData() {
-    // Load from localStorage if available
     if (typeof window !== 'undefined') {
-      const savedMessages = localStorage.getItem('nordlion_messages')
-      const savedConversations = localStorage.getItem('nordlion_conversations')
-
-      if (savedMessages) {
-        const parsed = JSON.parse(savedMessages)
-        this.messages = new Map(Object.entries(parsed).map(([k, v]: [string, any]) => [
-          k,
-          (v as any[]).map(m => ({ ...m, timestamp: new Date(m.timestamp) }))
-        ]))
-      }
-
-      if (savedConversations) {
-        const parsed = JSON.parse(savedConversations)
-        this.conversations = new Map(Object.entries(parsed))
-      }
-
-      // If no saved data, initialize with defaults
-      if (!savedMessages || !savedConversations) {
-        this.initializeDefaults()
+      this.loadFromStorage()
+      if (this.conversations.size === 0) {
+        this.initializeDefaultConversations()
       }
     }
   }
 
-  private initializeDefaults() {
-    // Client conversations (talking to brokers/support)
-    const clientConversations: Conversation[] = [
-      { id: 'c1', name: 'Sarah - Broker', avatar: 'SB', lastMessage: 'Your Porsche 911 GT3 RS is ready for delivery!', time: '2m ago', unread: 2, online: true, role: 'client' },
-      { id: 'c2', name: 'Support Team', avatar: 'ST', lastMessage: 'We\'ve processed your document request', time: '1h ago', unread: 0, online: false, role: 'client' },
-      { id: 'c3', name: 'John - Sales', avatar: 'JS', lastMessage: 'I found a Ferrari SF90 that matches your criteria', time: '3h ago', unread: 1, online: true, role: 'client' },
-      { id: 'c4', name: 'Emma - Finance', avatar: 'EF', lastMessage: 'Your financing has been approved', time: 'Yesterday', unread: 0, online: false, role: 'client' },
-    ]
+  private loadFromStorage() {
+    try {
+      const storedMessages = localStorage.getItem('nordlion_messages')
+      const storedConversations = localStorage.getItem('nordlion_conversations')
 
-    // Broker conversations (talking to clients)
-    const brokerConversations: Conversation[] = [
-      { id: 'b1', name: 'John Smith', avatar: 'JS', lastMessage: 'When can I view the Porsche?', time: '5m ago', unread: 3, online: true, role: 'broker' },
-      { id: 'b2', name: 'Emma Wilson', avatar: 'EW', lastMessage: 'Thanks for the quote!', time: '1h ago', unread: 0, online: false, role: 'broker' },
-      { id: 'b3', name: 'Michael Brown', avatar: 'MB', lastMessage: 'Looking for a Lamborghini', time: '3h ago', unread: 2, online: true, role: 'broker' },
-      { id: 'b4', name: 'Sarah Johnson', avatar: 'SJ', lastMessage: 'Confirmed the delivery', time: 'Yesterday', unread: 0, online: false, role: 'broker' },
-    ]
+      if (storedMessages) {
+        const parsed = JSON.parse(storedMessages)
+        Object.entries(parsed).forEach(([convId, msgs]: [string, any[]]) => {
+          this.messages.set(
+            convId,
+            msgs.map(m => ({ ...m, timestamp: new Date(m.timestamp) }))
+          )
+        })
+      }
 
-    // Store conversations
-    clientConversations.forEach(c => this.conversations.set(c.id, c))
-    brokerConversations.forEach(c => this.conversations.set(c.id, c))
-
-    // Initialize default messages
-    this.messages.set('c1', [
-      { id: 'm1', conversationId: 'c1', text: 'Hello! I have an update on your order.', sender: 'other', senderName: 'Sarah', timestamp: new Date(), read: true },
-      { id: 'm2', conversationId: 'c1', text: 'Great! What\'s the news?', sender: 'me', senderName: 'You', timestamp: new Date(), read: true },
-      { id: 'm3', conversationId: 'c1', text: 'Your Porsche 911 GT3 RS has cleared customs and is ready for delivery!', sender: 'other', senderName: 'Sarah', timestamp: new Date(), read: false },
-      { id: 'm4', conversationId: 'c1', text: 'That\'s fantastic! When can I expect it?', sender: 'me', senderName: 'You', timestamp: new Date(), read: true },
-      { id: 'm5', conversationId: 'c1', text: 'We can arrange delivery for tomorrow afternoon. Does 2 PM work for you?', sender: 'other', senderName: 'Sarah', timestamp: new Date(), read: false },
-    ])
-
-    this.messages.set('b1', [
-      { id: 'm6', conversationId: 'b1', text: 'Hi, I\'m interested in the Porsche 911 GT3 RS', sender: 'other', senderName: 'John', timestamp: new Date(), read: true },
-      { id: 'm7', conversationId: 'b1', text: 'Great choice! When would you like to schedule a viewing?', sender: 'me', senderName: 'You', timestamp: new Date(), read: true },
-      { id: 'm8', conversationId: 'b1', text: 'How about this weekend?', sender: 'other', senderName: 'John', timestamp: new Date(), read: false },
-      { id: 'm9', conversationId: 'b1', text: 'Saturday at 2 PM works perfectly.', sender: 'me', senderName: 'You', timestamp: new Date(), read: true },
-      { id: 'm10', conversationId: 'b1', text: 'When can I view the Porsche?', sender: 'other', senderName: 'John', timestamp: new Date(), read: false },
-    ])
-
-    this.saveToLocalStorage()
+      if (storedConversations) {
+        const parsed = JSON.parse(storedConversations)
+        Object.entries(parsed).forEach(([id, conv]: [string, any]) => {
+          this.conversations.set(id, conv)
+        })
+      }
+    } catch (error) {
+      console.error('Failed to load messages from storage:', error)
+    }
   }
 
-  private saveToLocalStorage() {
-    if (typeof window !== 'undefined') {
+  private saveToStorage() {
+    try {
       const messagesObj: Record<string, Message[]> = {}
-      this.messages.forEach((messages, conversationId) => {
-        messagesObj[conversationId] = messages
+      this.messages.forEach((msgs, convId) => {
+        messagesObj[convId] = msgs
       })
 
       const conversationsObj: Record<string, Conversation> = {}
-      this.conversations.forEach((conversation, id) => {
-        conversationsObj[id] = conversation
+      this.conversations.forEach((conv, id) => {
+        conversationsObj[id] = conv
       })
 
       localStorage.setItem('nordlion_messages', JSON.stringify(messagesObj))
       localStorage.setItem('nordlion_conversations', JSON.stringify(conversationsObj))
+    } catch (error) {
+      console.error('Failed to save messages to storage:', error)
     }
   }
 
-  // Get conversations by role
+  private initializeDefaultConversations() {
+    const defaultConversations: Conversation[] = [
+      {
+        id: 'broker-1',
+        name: 'Sarah Johnson (Broker)',
+        avatar: 'SJ',
+        lastMessage: 'Your Porsche GT3 RS order is being processed',
+        time: '2m ago',
+        unread: 2,
+        online: true,
+        role: 'client'
+      },
+      {
+        id: 'support',
+        name: 'Support Team',
+        avatar: 'ST',
+        lastMessage: 'How can we help you today?',
+        time: '1h ago',
+        unread: 0,
+        online: true,
+        role: 'client'
+      },
+      {
+        id: 'client-1',
+        name: 'John Smith',
+        avatar: 'JS',
+        lastMessage: 'Thank you for the update!',
+        time: '3h ago',
+        unread: 1,
+        online: false,
+        role: 'broker'
+      }
+    ]
+
+    const defaultMessages: Record<string, Message[]> = {
+      'broker-1': [
+        {
+          id: 'm1',
+          conversationId: 'broker-1',
+          text: 'Hello! I\'m Sarah, your assigned broker. I\'ll be helping you with your vehicle purchase.',
+          sender: 'other',
+          senderName: 'Sarah Johnson',
+          timestamp: new Date(Date.now() - 3600000),
+          read: true
+        },
+        {
+          id: 'm2',
+          conversationId: 'broker-1',
+          text: 'Hi Sarah! Thank you. I\'m interested in the Porsche 911 GT3 RS.',
+          sender: 'me',
+          senderName: 'You',
+          timestamp: new Date(Date.now() - 3500000),
+          read: true
+        },
+        {
+          id: 'm3',
+          conversationId: 'broker-1',
+          text: 'Excellent choice! That\'s one of our most popular models. The GT3 RS is currently available in GT Silver Metallic.',
+          sender: 'other',
+          senderName: 'Sarah Johnson',
+          timestamp: new Date(Date.now() - 3400000),
+          read: true
+        },
+        {
+          id: 'm4',
+          conversationId: 'broker-1',
+          text: 'Perfect! What\'s the next step?',
+          sender: 'me',
+          senderName: 'You',
+          timestamp: new Date(Date.now() - 3300000),
+          read: true
+        },
+        {
+          id: 'm5',
+          conversationId: 'broker-1',
+          text: 'I\'ve started processing your order. I\'ll need some documents from you.',
+          sender: 'other',
+          senderName: 'Sarah Johnson',
+          timestamp: new Date(Date.now() - 120000),
+          read: false
+        },
+        {
+          id: 'm6',
+          conversationId: 'broker-1',
+          text: 'Your Porsche GT3 RS order is being processed. Expected delivery: 2-3 weeks.',
+          sender: 'other',
+          senderName: 'Sarah Johnson',
+          timestamp: new Date(Date.now() - 60000),
+          read: false
+        }
+      ],
+      'support': [
+        {
+          id: 's1',
+          conversationId: 'support',
+          text: 'Welcome to NordLion Auto! How can we help you today?',
+          sender: 'other',
+          senderName: 'Support Team',
+          timestamp: new Date(Date.now() - 7200000),
+          read: true
+        },
+        {
+          id: 's2',
+          conversationId: 'support',
+          text: 'I have a question about vehicle shipping.',
+          sender: 'me',
+          senderName: 'You',
+          timestamp: new Date(Date.now() - 7100000),
+          read: true
+        },
+        {
+          id: 's3',
+          conversationId: 'support',
+          text: 'We offer worldwide shipping! Would you like more details?',
+          sender: 'other',
+          senderName: 'Support Team',
+          timestamp: new Date(Date.now() - 7000000),
+          read: true
+        }
+      ],
+      'client-1': [
+        {
+          id: 'c1',
+          conversationId: 'client-1',
+          text: 'Your Ferrari SF90 has arrived at our facility!',
+          sender: 'me',
+          senderName: 'You',
+          timestamp: new Date(Date.now() - 10800000),
+          read: true
+        },
+        {
+          id: 'c2',
+          conversationId: 'client-1',
+          text: 'That\'s great news! When can I pick it up?',
+          sender: 'other',
+          senderName: 'John Smith',
+          timestamp: new Date(Date.now() - 10700000),
+          read: false
+        },
+        {
+          id: 'c3',
+          conversationId: 'client-1',
+          text: 'You can schedule a pickup anytime this week.',
+          sender: 'me',
+          senderName: 'You',
+          timestamp: new Date(Date.now() - 10600000),
+          read: true
+        },
+        {
+          id: 'c4',
+          conversationId: 'client-1',
+          text: 'Thank you for the update!',
+          sender: 'other',
+          senderName: 'John Smith',
+          timestamp: new Date(Date.now() - 10500000),
+          read: false
+        }
+      ]
+    }
+
+    defaultConversations.forEach(c => this.conversations.set(c.id, c))
+    Object.entries(defaultMessages).forEach(([convId, msgs]) => this.messages.set(convId, msgs))
+    
+    this.saveToStorage()
+  }
+
   getConversations(role: 'client' | 'broker' | 'admin'): Conversation[] {
-    return Array.from(this.conversations.values()).filter(c => c.role === role)
+    return Array.from(this.conversations.values())
+      .filter(c => c.role === role)
+      .sort((a, b) => {
+        // Sort by unread first, then by time
+        if (a.unread > 0 && b.unread === 0) return -1
+        if (a.unread === 0 && b.unread > 0) return 1
+        return 0
+      })
   }
 
-  // Get messages for a conversation
   getMessages(conversationId: string): Message[] {
-    return this.messages.get(conversationId) || []
+    const messages = this.messages.get(conversationId) || []
+    return messages.sort((a, b) => 
+      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    )
   }
 
-  // Add a new message
-  addMessage(conversationId: string, message: Omit<Message, 'id'>): Message {
+  addMessage(conversationId: string, message: Omit<Message, 'id'>): void {
     const newMessage: Message = {
       ...message,
-      id: `m${Date.now()}`,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
 
-    const messages = this.messages.get(conversationId) || []
-    messages.push(newMessage)
-    this.messages.set(conversationId, messages)
+    const existing = this.messages.get(conversationId) || []
+    existing.push(newMessage)
+    this.messages.set(conversationId, existing)
 
     // Update conversation
     const conversation = this.conversations.get(conversationId)
     if (conversation) {
-      conversation.lastMessage = message.text
+      conversation.lastMessage = message.text.substring(0, 50) + (message.text.length > 50 ? '...' : '')
       conversation.time = 'Just now'
       this.conversations.set(conversationId, conversation)
     }
 
-    this.saveToLocalStorage()
-    return newMessage
+    this.saveToStorage()
   }
 
-  // Mark messages as read
-  markAsRead(conversationId: string) {
-    const messages = this.messages.get(conversationId) || []
-    messages.forEach(m => {
-      if (m.sender === 'other') {
-        m.read = true
-      }
-    })
-    this.messages.set(conversationId, messages)
-
-    // Update unread count
+  markAsRead(conversationId: string): void {
     const conversation = this.conversations.get(conversationId)
     if (conversation) {
       conversation.unread = 0
       this.conversations.set(conversationId, conversation)
+      this.saveToStorage()
     }
 
-    this.saveToLocalStorage()
+    // Mark all messages as read
+    const messages = this.messages.get(conversationId)
+    if (messages) {
+      messages.forEach(m => m.read = true)
+      this.messages.set(conversationId, messages)
+      this.saveToStorage()
+    }
   }
 
-  // Get unread count for a conversation
   getUnreadCount(conversationId: string): number {
-    const messages = this.messages.get(conversationId) || []
-    return messages.filter(m => m.sender === 'other' && !m.read).length
+    const conversation = this.conversations.get(conversationId)
+    return conversation?.unread || 0
   }
 
-  // Clear all data (for testing)
-  clearAll() {
+  clearAllData(): void {
     this.messages.clear()
     this.conversations.clear()
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('nordlion_messages')
-      localStorage.removeItem('nordlion_conversations')
-    }
-    this.initializeDefaults()
+    localStorage.removeItem('nordlion_messages')
+    localStorage.removeItem('nordlion_conversations')
+    this.initializeDefaultConversations()
   }
 }
 

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import DraggableWidget from '@/components/DraggableWidget'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Users, Package, DollarSign, TrendingUp } from 'lucide-react'
+import { Users, Package, DollarSign, TrendingUp, MessageSquare } from 'lucide-react'
 
 export default function BrokerDashboard() {
   const router = useRouter()
@@ -34,6 +35,13 @@ export default function BrokerDashboard() {
 
   if (!user) return null
 
+  const stats = [
+    { icon: Users, label: 'Active Clients', value: '24', color: 'bg-[#D67C3C]', link: '/broker/clients' },
+    { icon: Package, label: 'Inventory', value: '156', color: 'bg-blue-500', link: '/broker/inventory' },
+    { icon: DollarSign, label: 'Commission', value: '$145K', color: 'bg-green-500', link: '/broker/clients?view=earnings' },
+    { icon: MessageSquare, label: 'Unread', value: '12', color: 'bg-purple-500', link: '/broker/messages' },
+  ]
+
   return (
     <div className="flex h-screen bg-[#0f0f0f]">
       <Sidebar role="broker" />
@@ -49,23 +57,22 @@ export default function BrokerDashboard() {
         </header>
 
         <main className="max-w-7xl mx-auto px-6 py-8">
-          {/* Stats */}
+          {/* Clickable Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[
-              { icon: Users, label: 'Active Clients', value: '24', color: 'bg-[#D67C3C]' },
-              { icon: Package, label: 'Inventory', value: '156', color: 'bg-blue-500' },
-              { icon: DollarSign, label: 'Commission', value: '$145K', color: 'bg-green-500' },
-              { icon: TrendingUp, label: 'Sales', value: '18', color: 'bg-purple-500' },
-            ].map((stat, i) => {
+            {stats.map((stat, i) => {
               const Icon = stat.icon
               return (
-                <div key={i} className="bg-[#141414] border border-white/5 rounded-xl p-6">
-                  <div className={`w-10 h-10 rounded-lg ${stat.color}/10 flex items-center justify-center mb-4`}>
+                <Link
+                  key={i}
+                  href={stat.link}
+                  className="bg-[#141414] border border-white/5 rounded-xl p-6 hover:border-[#D67C3C]/30 transition-all cursor-pointer group"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${stat.color}/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                     <Icon size={20} className={stat.color.replace('bg-', 'text-')} />
                   </div>
-                  <p className="text-2xl font-light text-white mb-1">{stat.value}</p>
+                  <p className="text-2xl font-light text-white mb-1 group-hover:text-[#D67C3C] transition-colors">{stat.value}</p>
                   <p className="text-sm text-white/50 font-light">{stat.label}</p>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -107,11 +114,15 @@ export default function BrokerDashboard() {
             >
               <div className="space-y-3">
                 {[
-                  { name: 'John Smith', action: 'Purchased Ferrari SF90', time: '2h ago' },
-                  { name: 'Emma Wilson', action: 'Viewing Porsche 911', time: '5h ago' },
-                  { name: 'Michael Brown', action: 'Requested quote', time: '1d ago' },
+                  { name: 'John Smith', action: 'Purchased Ferrari SF90', time: '2h ago', link: '/broker/clients' },
+                  { name: 'Emma Wilson', action: 'Viewing Porsche 911', time: '5h ago', link: '/broker/clients' },
+                  { name: 'Michael Brown', action: 'Requested quote', time: '1d ago', link: '/broker/clients' },
                 ].map((client, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg">
+                  <Link
+                    key={i}
+                    href={client.link}
+                    className="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg hover:bg-white/5 transition-colors"
+                  >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white text-xs font-medium">
                       {client.name.split(' ').map(n => n[0]).join('')}
                     </div>
@@ -120,7 +131,7 @@ export default function BrokerDashboard() {
                       <p className="text-xs text-white/40 font-light mt-1">{client.action}</p>
                     </div>
                     <span className="text-xs text-white/30 font-light">{client.time}</span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </DraggableWidget>

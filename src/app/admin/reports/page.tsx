@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
-import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { TrendingUp, DollarSign, Users, Package, Download, Calendar, BarChart3, PieChart } from 'lucide-react'
+import Link from 'next/link'
+import { getCurrentUser, canAccessDashboard, logout } from '@/lib/auth'
+import { TrendingUp, DollarSign, Users, Package, Download, Calendar, BarChart3, PieChart, LogOut, Home } from 'lucide-react'
 
 export default function AdminReports() {
   const router = useRouter()
@@ -20,26 +20,45 @@ export default function AdminReports() {
     setUser(currentUser)
   }, [router])
 
+  const handleLogout = () => {
+    logout()
+    router.push('/auth/login')
+  }
+
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
+    <div className="min-h-screen bg-[#0f0f0f]">
       <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-light text-white">Reports & Analytics</h1>
-              <p className="text-sm text-white/50 font-light mt-1">Performance insights and data</p>
+            <div className="flex items-center gap-4">
+              <Link href="/admin" className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                <Home size={20} className="text-white/60" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-white">Reports & Analytics</h1>
+                <p className="text-sm text-white/50 font-light mt-1">Performance insights and data</p>
+              </div>
             </div>
-            <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-              <Download size={16} />
-              Export Report
-            </button>
+            <div className="flex items-center gap-2">
+              <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                <Download size={16} />
+                Export Report
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors flex items-center gap-2 text-red-400 font-medium"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 pb-16">
         {/* Period Selector */}
         <div className="flex items-center gap-2 mb-8">
           {['week', 'month', 'quarter', 'year'].map((period) => (
@@ -164,8 +183,6 @@ export default function AdminReports() {
           </div>
         </div>
       </main>
-
-      <BottomNav />
     </div>
   )
 }

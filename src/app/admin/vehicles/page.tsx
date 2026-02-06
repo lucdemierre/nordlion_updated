@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
-import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Search, Filter, Plus, Edit, Trash2, Eye, Package, TrendingUp, DollarSign, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
+import { getCurrentUser, canAccessDashboard, logout } from '@/lib/auth'
+import { Search, Filter, Plus, Edit, Trash2, Eye, Package, TrendingUp, DollarSign, CheckCircle, LogOut, Home } from 'lucide-react'
 
 interface Vehicle {
   id: string
@@ -34,6 +34,11 @@ export default function AdminVehicles() {
     setUser(currentUser)
   }, [router])
 
+  const handleLogout = () => {
+    logout()
+    router.push('/auth/login')
+  }
+
   const vehicles: Vehicle[] = [
     { id: '1', make: 'Porsche', model: '911 GT3 RS', year: 2024, price: 289000, status: 'available', mileage: 1200, location: 'London, UK', addedDate: 'Feb 1, 2026', views: 2847, inquiries: 23 },
     { id: '2', make: 'Ferrari', model: 'SF90 Stradale', year: 2023, price: 625000, status: 'reserved', mileage: 850, location: 'Monaco', addedDate: 'Jan 28, 2026', views: 4521, inquiries: 45 },
@@ -57,18 +62,32 @@ export default function AdminVehicles() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
+    <div className="min-h-screen bg-[#0f0f0f]">
       <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-light text-white">Vehicle Inventory</h1>
-              <p className="text-sm text-white/50 font-light mt-1">{vehicles.length} total vehicles</p>
+            <div className="flex items-center gap-4">
+              <Link href="/admin" className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                <Home size={20} className="text-white/60" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-white">Vehicle Inventory</h1>
+                <p className="text-sm text-white/50 font-light mt-1">{vehicles.length} total vehicles</p>
+              </div>
             </div>
-            <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-              <Plus size={16} />
-              Add Vehicle
-            </button>
+            <div className="flex items-center gap-2">
+              <button className="px-4 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                <Plus size={16} />
+                Add Vehicle
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors flex items-center gap-2 text-red-400 font-medium"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -193,8 +212,6 @@ export default function AdminVehicles() {
           </div>
         </div>
       </main>
-
-      <BottomNav />
     </div>
   )
 }

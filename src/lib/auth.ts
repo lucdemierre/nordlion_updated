@@ -8,6 +8,12 @@ export interface User {
   role: UserRole
 }
 
+export interface LoginResult {
+  success: boolean
+  user?: User
+  message?: string
+}
+
 // Mock user database
 const users = [
   {
@@ -36,7 +42,7 @@ const users = [
   },
 ]
 
-export function login(email: string, password: string): User | null {
+export function login(email: string, password: string): LoginResult {
   const user = users.find((u) => u.email === email && u.password === password)
   if (user) {
     const { password: _, ...userWithoutPassword } = user
@@ -44,9 +50,15 @@ export function login(email: string, password: string): User | null {
       localStorage.setItem('user', JSON.stringify(userWithoutPassword))
       localStorage.setItem('isAuthenticated', 'true')
     }
-    return userWithoutPassword
+    return {
+      success: true,
+      user: userWithoutPassword
+    }
   }
-  return null
+  return {
+    success: false,
+    message: 'Invalid email or password'
+  }
 }
 
 export function logout(): void {

@@ -11,16 +11,6 @@ interface DraggableWidgetProps {
   onPositionChange?: (id: string, position: { x: number; y: number }) => void
 }
 
-const GRID_SIZE = 20 // Snap to 20px grid
-const WIDGET_POSITIONS = [
-  { x: 0, y: 0 },
-  { x: 1, y: 0 },
-  { x: 0, y: 1 },
-  { x: 1, y: 1 },
-  { x: 0, y: 2 },
-  { x: 1, y: 2 },
-]
-
 export default function DraggableWidget({
   id,
   title,
@@ -31,48 +21,28 @@ export default function DraggableWidget({
   const [isDragging, setIsDragging] = useState(false)
   const [position, setPosition] = useState(initialPosition || { x: 0, y: 0 })
   const widgetRef = useRef<HTMLDivElement>(null)
-  const dragStartPos = useRef({ x: 0, y: 0 })
   const dragOffset = useRef({ x: 0, y: 0 })
-
-  // Snap to grid function
-  const snapToGrid = (value: number) => {
-    return Math.round(value / GRID_SIZE) * GRID_SIZE
-  }
-
-  // Find nearest valid position
-  const findNearestPosition = (x: number, y: number) => {
-    // Convert pixels to grid coordinates
-    const gridX = Math.round(x / 300) // Assuming ~300px widget width
-    const gridY = Math.round(y / 250) // Assuming ~250px widget height
-    
-    // Clamp to valid grid positions
-    const clampedX = Math.max(0, Math.min(1, gridX))
-    const clampedY = Math.max(0, Math.min(2, gridY))
-    
-    return {
-      x: clampedX * 300,
-      y: clampedY * 250,
-    }
-  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.drag-handle')) {
       setIsDragging(true)
-      dragStartPos.current = { x: e.clientX, y: e.clientY }
-      dragOffset.current = { x: position.x, y: position.y }
+      
+      if (widgetRef.current) {
+        const rect = widgetRef.current.getBoundingClientRect()
+        dragOffset.current = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        }
+      }
       e.preventDefault()
     }
   }
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const deltaX = e.clientX - dragStartPos.current.x
-      const deltaY = e.clientY - dragStartPos.current.y
+    if (isDragging && widgetRef.current) {
+      const newX = e.clientX - dragOffset.current.x
+      const newY = e.clientY - dragOffset.current.y
       
-      const newX = dragOffset.current.x + deltaX
-      const newY = dragOffset.current.y + deltaY
-      
-      // Apply boundaries (don't let it go negative)
       setPosition({
         x: Math.max(0, newX),
         y: Math.max(0, newY),
@@ -80,12 +50,26 @@ export default function DraggableWidget({
     }
   }
 
+  const snapToGrid = (x: number, y: number) => {
+    // Snap to grid positions - 2 columns
+    const gridWidth = 600 // Approximate width for 2 columns
+    const gridHeight = 300 // Approximate height per row
+    
+    const col = Math.round(x / gridWidth)
+    const row = Math.round(y / gridHeight)
+    
+    return {
+      x: Math.max(0, Math.min(col, 1)) * gridWidth,
+      y: Math.max(0, row) * gridHeight,
+    }
+  }
+
   const handleMouseUp = () => {
     if (isDragging) {
       setIsDragging(false)
       
-      // Snap to nearest valid position
-      const snappedPosition = findNearestPosition(position.x, position.y)
+      // Snap to grid
+      const snappedPosition = snapToGrid(position.x, position.y)
       setPosition(snappedPosition)
       
       if (onPositionChange) {
@@ -109,13 +93,13 @@ export default function DraggableWidget({
     <div
       ref={widgetRef}
       className={`bg-[#141414] border border-white/5 rounded-xl p-6 transition-shadow ${
-        isDragging ? 'shadow-2xl shadow-[#D67C3C]/20 cursor-grabbing z-50' : 'cursor-auto'
+        isDragging ? 'shadow-2xl shadow-[#D67C3C]/20 cursor-grabbing z-50 fixed' : 'relative'
       }`}
-      style={{
-        position: isDragging ? 'fixed' : 'relative',
-        transform: isDragging ? `translate(${position.x}px, ${position.y}px)` : 'none',
-        pointerEvents: isDragging ? 'none' : 'auto',
-      }}
+      style={isDragging ? {
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        width: widgetRef.current?.offsetWidth || 'auto',
+      } : {}}
       onMouseDown={handleMouseDown}
     >
       <div className="flex items-center justify-between mb-4">

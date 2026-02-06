@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
 import DraggableWidget from '@/components/DraggableWidget'
-import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Users, Package, TrendingUp, DollarSign, Activity, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { getCurrentUser, canAccessDashboard, logout } from '@/lib/auth'
+import { Users, Package, TrendingUp, DollarSign, Activity, AlertCircle, CheckCircle, Clock, LogOut } from 'lucide-react'
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -32,10 +31,15 @@ export default function AdminDashboard() {
     localStorage.setItem('admin_widget_positions', JSON.stringify(newPositions))
   }
 
+  const handleLogout = () => {
+    logout()
+    router.push('/auth/login')
+  }
+
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
+    <div className="min-h-screen bg-[#0f0f0f] pb-8">
       <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
@@ -53,6 +57,13 @@ export default function AdminDashboard() {
                   All Systems Operational
                 </p>
               </div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors flex items-center gap-2 text-red-400 font-medium"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -193,8 +204,6 @@ export default function AdminDashboard() {
           </div>
         </DraggableWidget>
       </main>
-
-      <BottomNav />
     </div>
   )
 }

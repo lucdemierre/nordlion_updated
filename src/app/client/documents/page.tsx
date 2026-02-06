@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { FileText, Download, Eye, Upload, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { documentStore } from '@/lib/database/documentStore'
+import { FileText, Download, Eye, Trash2, Upload, CheckCircle, Clock, XCircle } from 'lucide-react'
 
 export default function ClientDocuments() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [documents, setDocuments] = useState<any[]>([])
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -17,15 +19,45 @@ export default function ClientDocuments() {
       return
     }
     setUser(currentUser)
+
+    // Get user documents
+    const userDocs = documentStore.getByUserId('u1') // Current user ID
+    setDocuments(userDocs)
   }, [router])
 
-  const documents = [
-    { id: '1', name: 'Purchase Agreement - Porsche 911.pdf', type: 'Contract', status: 'approved', date: 'Feb 1, 2026', size: '2.4 MB' },
-    { id: '2', name: 'Vehicle Registration.pdf', type: 'Registration', status: 'pending', date: 'Jan 30, 2026', size: '1.8 MB' },
-    { id: '3', name: 'Insurance Certificate.pdf', type: 'Insurance', status: 'approved', date: 'Jan 28, 2026', size: '1.2 MB' },
-    { id: '4', name: 'Inspection Report - Ferrari.pdf', type: 'Inspection', status: 'pending', date: 'Jan 25, 2026', size: '3.1 MB' },
-    { id: '5', name: 'Financing Agreement.pdf', type: 'Finance', status: 'approved', date: 'Jan 20, 2026', size: '2.7 MB' },
-  ]
+  const handleDownload = (docId: string) => {
+    documentStore.downloadDocument(docId)
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <CheckCircle size={16} className="text-green-400" />
+      case 'pending':
+        return <Clock size={16} className="text-yellow-400" />
+      case 'rejected':
+        return <XCircle size={16} className="text-red-400" />
+      default:
+        return null
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-green-500/10 text-green-400 border-green-500/20'
+      case 'pending':
+        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+      case 'rejected':
+        return 'bg-red-500/10 text-red-400 border-red-500/20'
+      default:
+        return 'bg-white/5 text-white/40 border-white/10'
+    }
+  }
+
+  const getTypeIcon = (type: string) => {
+    return <FileText size={20} className="text-[#D67C3C]" />
+  }
 
   if (!user) return null
 
@@ -51,60 +83,73 @@ export default function ClientDocuments() {
 
         <main className="max-w-7xl mx-auto px-6 py-8">
           <div className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
-            <table className="w-full">
-              <thead className="border-b border-white/5">
-                <tr className="text-left">
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Document</th>
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Size</th>
-                  <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {documents.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#D67C3C]/10 flex items-center justify-center">
-                          <FileText size={18} className="text-[#D67C3C]" />
-                        </div>
-                        <p className="text-sm text-white font-light">{doc.name}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white/70 font-light">{doc.type}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs ${
-                        doc.status === 'approved' ? 'bg-green-500/10 text-green-400' :
-                        doc.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' :
-                        'bg-red-500/10 text-red-400'
-                      }`}>
-                        {doc.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white/70 font-light">{doc.date}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white/70 font-light">{doc.size}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                          <Eye size={16} className="text-white/60" />
-                        </button>
-                        <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                          <Download size={16} className="text-white/60" />
-                        </button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="border-b border-white/5">
+                  <tr className="text-left">
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Document</th>
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Size</th>
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Uploaded</th>
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-xs font-medium text-white/50 uppercase tracking-wider">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {documents.map((doc) => (
+                    <tr key={doc.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-[#D67C3C]/10 flex items-center justify-center">
+                            {getTypeIcon(doc.type)}
+                          </div>
+                          <div>
+                            <p className="text-sm text-white font-medium">{doc.name}</p>
+                            <p className="text-xs text-white/40 font-light">{doc.id}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white/70 font-light capitalize">{doc.type}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white/70 font-light">{(doc.size / 1024).toFixed(1)} KB</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white/70 font-light">
+                          {new Date(doc.uploadedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(doc.status)}
+                          <span className={`px-3 py-1 rounded-full text-xs border ${getStatusColor(doc.status)}`}>
+                            {doc.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDownload(doc.id)}
+                            className="p-2 hover:bg-white/5 rounded-lg transition-colors group"
+                            title="Download"
+                          >
+                            <Download size={16} className="text-white/60 group-hover:text-[#D67C3C]" />
+                          </button>
+                          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors group" title="View">
+                            <Eye size={16} className="text-white/60 group-hover:text-blue-400" />
+                          </button>
+                          <button className="p-2 hover:bg-red-500/10 rounded-lg transition-colors group" title="Delete">
+                            <Trash2 size={16} className="text-white/60 group-hover:text-red-400" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
       </div>

@@ -29,17 +29,7 @@ export default function ClientMessages() {
   const [user, setUser] = useState<any>(null)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [messageInput, setMessageInput] = useState('')
-
-  useEffect(() => {
-    const currentUser = getCurrentUser()
-    if (!currentUser || !canAccessDashboard('client')) {
-      router.push('/auth/login')
-      return
-    }
-    setUser(currentUser)
-  }, [router])
-
-  const conversations: Conversation[] = [
+  const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: '1',
       name: 'Sarah - Broker',
@@ -101,22 +91,57 @@ export default function ClientMessages() {
         { id: '4', text: 'That\'s excellent! Thank you!', sender: 'me', time: 'Yesterday 4:10 PM' },
       ],
     },
-  ]
+  ])
 
-  const activeConversation = conversations.find(c => c.id === selectedConversation)
-
-  // Set default conversation on mount
   useEffect(() => {
+    const currentUser = getCurrentUser()
+    if (!currentUser || !canAccessDashboard('client')) {
+      router.push('/auth/login')
+      return
+    }
+    setUser(currentUser)
+    
+    // Set default conversation
     if (conversations.length > 0 && !selectedConversation) {
       setSelectedConversation(conversations[0].id)
     }
-  }, [])
+  }, [router])
+
+  const activeConversation = conversations.find(c => c.id === selectedConversation)
 
   const handleSendMessage = () => {
     if (messageInput.trim() && activeConversation) {
-      // In production, send via API
-      console.log('Sending message:', messageInput)
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: messageInput.trim(),
+        sender: 'me',
+        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      }
+
+      // Update conversations state
+      setConversations(prevConversations => 
+        prevConversations.map(conv => {
+          if (conv.id === selectedConversation) {
+            return {
+              ...conv,
+              messages: [...conv.messages, newMessage],
+              lastMessage: newMessage.text,
+              time: 'Just now',
+            }
+          }
+          return conv
+        })
+      )
+
       setMessageInput('')
+      
+      // Scroll to bottom
+      setTimeout(() => {
+        const messagesContainer = document.querySelector('.messages-container')
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight
+        }
+      }, 100)
     }
   }
 
@@ -211,7 +236,7 @@ export default function ClientMessages() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 messages-container">
               {activeConversation.messages.map((message) => (
                 <div
                   key={message.id}
@@ -243,7 +268,8 @@ export default function ClientMessages() {
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-4 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-colors flex items-center gap-2"
+                  disabled={!messageInput.trim()}
+                  className="px-4 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send size={18} />
                 </button>

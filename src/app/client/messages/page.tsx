@@ -2,57 +2,33 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '@/components/BottomNav'
+import Sidebar from '@/components/Sidebar'
 import { getCurrentUser, canAccessDashboard } from '@/lib/auth'
-import { Send, Search, Phone, Video, MoreVertical, Paperclip, Smile } from 'lucide-react'
+import { Search, Send, Paperclip, Phone, Video, MoreVertical } from 'lucide-react'
 
 interface Message {
   id: string
-  sender: 'user' | 'support'
-  content: string
-  timestamp: Date
-  read: boolean
+  text: string
+  sender: 'me' | 'other'
+  time: string
 }
 
 interface Conversation {
   id: string
   name: string
-  role: string
   avatar: string
   lastMessage: string
-  timestamp: string
+  time: string
   unread: number
   online: boolean
+  messages: Message[]
 }
 
 export default function ClientMessages() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [selectedConvo, setSelectedConvo] = useState<string>('1')
-  const [newMessage, setNewMessage] = useState('')
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      sender: 'support',
-      content: 'Hello! How can I assist you with your vehicle order today?',
-      timestamp: new Date(Date.now() - 3600000),
-      read: true,
-    },
-    {
-      id: '2',
-      sender: 'user',
-      content: 'Hi! I wanted to check on the delivery status of my Porsche 911 GT3 RS.',
-      timestamp: new Date(Date.now() - 3400000),
-      read: true,
-    },
-    {
-      id: '3',
-      sender: 'support',
-      content: 'Of course! Your Porsche 911 GT3 RS is currently in transit and expected to arrive on February 15th. I can provide you with the tracking number if you\'d like.',
-      timestamp: new Date(Date.now() - 3200000),
-      read: true,
-    },
-  ])
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
+  const [messageInput, setMessageInput] = useState('')
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -66,220 +42,220 @@ export default function ClientMessages() {
   const conversations: Conversation[] = [
     {
       id: '1',
-      name: 'Sales Team',
-      role: 'Vehicle Specialist',
-      avatar: 'ST',
-      lastMessage: 'Your Porsche is in transit...',
-      timestamp: '2h ago',
-      unread: 0,
+      name: 'Sarah - Broker',
+      avatar: 'SB',
+      lastMessage: 'Your Porsche 911 GT3 RS is ready for delivery!',
+      time: '2m ago',
+      unread: 2,
       online: true,
+      messages: [
+        { id: '1', text: 'Hello! I have an update on your order.', sender: 'other', time: '10:30 AM' },
+        { id: '2', text: 'Great! What\'s the news?', sender: 'me', time: '10:32 AM' },
+        { id: '3', text: 'Your Porsche 911 GT3 RS has cleared customs and is ready for delivery!', sender: 'other', time: '10:33 AM' },
+        { id: '4', text: 'That\'s fantastic! When can I expect it?', sender: 'me', time: '10:35 AM' },
+        { id: '5', text: 'We can arrange delivery for tomorrow afternoon. Does 2 PM work for you?', sender: 'other', time: '10:36 AM' },
+      ],
     },
     {
       id: '2',
-      name: 'Support',
-      role: 'Customer Service',
-      avatar: 'CS',
-      lastMessage: 'We\'ve received your inquiry',
-      timestamp: '1d ago',
-      unread: 2,
+      name: 'Support Team',
+      avatar: 'ST',
+      lastMessage: 'We\'ve processed your document request',
+      time: '1h ago',
+      unread: 0,
       online: false,
+      messages: [
+        { id: '1', text: 'Hi, how can I help you today?', sender: 'other', time: '9:00 AM' },
+        { id: '2', text: 'I need a copy of my purchase agreement', sender: 'me', time: '9:05 AM' },
+        { id: '3', text: 'I\'ll get that for you right away.', sender: 'other', time: '9:06 AM' },
+        { id: '4', text: 'We\'ve processed your document request. Check your Documents section.', sender: 'other', time: '9:15 AM' },
+      ],
     },
     {
       id: '3',
-      name: 'Finance Team',
-      role: 'Payment Processing',
-      avatar: 'FT',
-      lastMessage: 'Payment confirmed',
-      timestamp: '3d ago',
+      name: 'John - Sales',
+      avatar: 'JS',
+      lastMessage: 'I found a Ferrari SF90 that matches your criteria',
+      time: '3h ago',
+      unread: 1,
+      online: true,
+      messages: [
+        { id: '1', text: 'Good morning! I have something exciting to show you.', sender: 'other', time: '7:30 AM' },
+        { id: '2', text: 'What is it?', sender: 'me', time: '7:45 AM' },
+        { id: '3', text: 'I found a Ferrari SF90 that matches your criteria - low mileage, perfect condition', sender: 'other', time: '7:46 AM' },
+        { id: '4', text: 'The price is $625,000. Interested?', sender: 'other', time: '7:47 AM' },
+      ],
+    },
+    {
+      id: '4',
+      name: 'Emma - Finance',
+      avatar: 'EF',
+      lastMessage: 'Your financing has been approved',
+      time: 'Yesterday',
       unread: 0,
       online: false,
+      messages: [
+        { id: '1', text: 'Good news about your financing application!', sender: 'other', time: 'Yesterday 4:00 PM' },
+        { id: '2', text: 'Tell me more!', sender: 'me', time: 'Yesterday 4:05 PM' },
+        { id: '3', text: 'Your financing has been approved for up to $1.5M at 3.2% APR', sender: 'other', time: 'Yesterday 4:06 PM' },
+        { id: '4', text: 'That\'s excellent! Thank you!', sender: 'me', time: 'Yesterday 4:10 PM' },
+      ],
     },
   ]
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return
+  const activeConversation = conversations.find(c => c.id === selectedConversation)
 
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      sender: 'user',
-      content: newMessage,
-      timestamp: new Date(),
-      read: false,
+  // Set default conversation on mount
+  useEffect(() => {
+    if (conversations.length > 0 && !selectedConversation) {
+      setSelectedConversation(conversations[0].id)
     }
+  }, [])
 
-    setMessages([...messages, userMsg])
-    setNewMessage('')
-
-    // Simulate response
-    setTimeout(() => {
-      const responseMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'support',
-        content: 'Thank you for your message. Our team will get back to you shortly.',
-        timestamp: new Date(),
-        read: false,
-      }
-      setMessages(prev => [...prev, responseMsg])
-    }, 1500)
+  const handleSendMessage = () => {
+    if (messageInput.trim() && activeConversation) {
+      // In production, send via API
+      console.log('Sending message:', messageInput)
+      setMessageInput('')
+    }
   }
 
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-24">
-      {/* Header */}
-      <header className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <h1 className="text-2xl font-light text-white">Messages</h1>
-          <p className="text-sm text-white/50 font-light mt-1">
-            Chat with your dedicated team
-          </p>
-        </div>
-      </header>
+    <div className="flex h-screen bg-[#0f0f0f]">
+      <Sidebar role="client" />
+      
+      <div className="flex-1 flex ml-16">
+        {/* Conversations List */}
+        <div className="w-80 border-r border-white/5 bg-[#0a0a0a] flex flex-col">
+          {/* Search */}
+          <div className="p-4 border-b border-white/5">
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                className="w-full pl-10 pr-4 py-2 bg-[#141414] border border-white/10 rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] font-light"
+              />
+            </div>
+          </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Conversations List */}
-          <div className="lg:col-span-1">
-            <div className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
-              {/* Search */}
-              <div className="p-4 border-b border-white/5">
+          {/* Conversation List */}
+          <div className="flex-1 overflow-y-auto">
+            {conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                onClick={() => setSelectedConversation(conversation.id)}
+                className={`w-full p-4 flex items-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
+                  selectedConversation === conversation.id ? 'bg-white/5' : ''
+                }`}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white font-medium">
+                    {conversation.avatar}
+                  </div>
+                  {conversation.online && (
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0a0a0a]"></div>
+                  )}
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-white truncate">{conversation.name}</p>
+                    <span className="text-xs text-white/40 font-light">{conversation.time}</span>
+                  </div>
+                  <p className="text-xs text-white/50 font-light truncate">{conversation.lastMessage}</p>
+                </div>
+                {conversation.unread > 0 && (
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#D67C3C] flex items-center justify-center">
+                    <span className="text-xs text-white font-medium">{conversation.unread}</span>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Chat Area */}
+        {activeConversation ? (
+          <div className="flex-1 flex flex-col">
+            {/* Chat Header */}
+            <div className="h-16 px-6 border-b border-white/5 flex items-center justify-between bg-[#0a0a0a]">
+              <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                  <input
-                    type="text"
-                    placeholder="Search conversations..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#0a0a0a] border border-white/10 rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] font-light"
-                  />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white font-medium text-sm">
+                    {activeConversation.avatar}
+                  </div>
+                  {activeConversation.online && (
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0a0a0a]"></div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{activeConversation.name}</p>
+                  <p className="text-xs text-white/40 font-light">
+                    {activeConversation.online ? 'Online' : 'Offline'}
+                  </p>
                 </div>
               </div>
+              <div className="flex items-center gap-2">
+                <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <Phone size={18} className="text-white/60" />
+                </button>
+                <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <Video size={18} className="text-white/60" />
+                </button>
+                <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <MoreVertical size={18} className="text-white/60" />
+                </button>
+              </div>
+            </div>
 
-              {/* Conversation List */}
-              <div className="divide-y divide-white/5">
-                {conversations.map((convo) => (
-                  <button
-                    key={convo.id}
-                    onClick={() => setSelectedConvo(convo.id)}
-                    className={`w-full p-4 text-left transition-colors ${
-                      selectedConvo === convo.id ? 'bg-[#D67C3C]/10' : 'hover:bg-white/5'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white font-medium">
-                          {convo.avatar}
-                        </div>
-                        {convo.online && (
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-sm font-medium text-white">{convo.name}</p>
-                          <span className="text-xs text-white/40 font-light">{convo.timestamp}</span>
-                        </div>
-                        <p className="text-xs text-white/40 font-light mb-1">{convo.role}</p>
-                        <p className="text-sm text-white/60 font-light truncate">{convo.lastMessage}</p>
-                        {convo.unread > 0 && (
-                          <div className="mt-2">
-                            <span className="px-2 py-1 bg-[#D67C3C] text-white text-xs rounded-full">
-                              {convo.unread} new
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))}
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {activeConversation.messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-md ${
+                    message.sender === 'me' ? 'bg-[#D67C3C]' : 'bg-[#141414]'
+                  } rounded-lg px-4 py-3`}>
+                    <p className="text-sm text-white font-light">{message.text}</p>
+                    <span className="text-xs text-white/40 font-light mt-1 block">{message.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Message Input */}
+            <div className="p-4 border-t border-white/5 bg-[#0a0a0a]">
+              <div className="flex items-center gap-3">
+                <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <Paperclip size={20} className="text-white/60" />
+                </button>
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-3 bg-[#141414] border border-white/10 rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] font-light"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="px-4 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <Send size={18} />
+                </button>
               </div>
             </div>
           </div>
-
-          {/* Chat Window */}
-          <div className="lg:col-span-2">
-            <div className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden flex flex-col h-[600px]">
-              {/* Chat Header */}
-              <div className="p-4 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] flex items-center justify-center text-white font-medium">
-                    ST
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">Sales Team</p>
-                    <p className="text-xs text-green-400 font-light">Online</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <Phone size={18} className="text-white/60" />
-                  </button>
-                  <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <Video size={18} className="text-white/60" />
-                  </button>
-                  <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <MoreVertical size={18} className="text-white/60" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[70%] rounded-xl p-3 ${
-                        msg.sender === 'user'
-                          ? 'bg-[#D67C3C] text-white'
-                          : 'bg-[#0a0a0a] text-white'
-                      }`}
-                    >
-                      <p className="text-sm font-light">{msg.content}</p>
-                      <p className="text-xs mt-2 opacity-60">
-                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Message Input */}
-              <div className="p-4 border-t border-white/5">
-                <div className="flex items-end gap-2">
-                  <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <Paperclip size={20} className="text-white/60" />
-                  </button>
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Type your message..."
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D67C3C] font-light pr-10"
-                    />
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors">
-                      <Smile size={20} />
-                    </button>
-                  </div>
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!newMessage.trim()}
-                    className="p-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Send size={20} />
-                  </button>
-                </div>
-              </div>
-            </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-white/40 font-light">Select a conversation to start messaging</p>
           </div>
-        </div>
-      </main>
-
-      <BottomNav />
+        )}
+      </div>
     </div>
   )
 }

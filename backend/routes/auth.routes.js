@@ -1,26 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { User } = require('../models');
-const { authenticateToken } = require('../middleware/auth.middleware');
+const { body, validationResult } = require('express-validator');
+const User = require('../models/User.model');
+const { authMiddleware } = require('../middleware/auth.middleware');
 
-// Generate JWT tokens
-const generateTokens = (userId) => {
-  const accessToken = jwt.sign(
-    { userId },
+// Generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: '7d' }
   );
-
-  const refreshToken = jwt.sign(
-    { userId },
-    process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '30d' }
-  );
-
-  return { accessToken, refreshToken };
 };
 
 // @route   POST /api/auth/register
@@ -29,12 +20,9 @@ const generateTokens = (userId) => {
 router.post(
   '/register',
   [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters'),
-    body('firstName').notEmpty().withMessage('First name is required'),
-    body('lastName').notEmpty().withMessage('Last name is required'),
+    body('email').isEmail().normalizeEmail(),
+    body('password').isLength({ min: 8 }),
+    body('name').trim().notEmpty(),
   ],
   async (req, res) => {
     try {
@@ -43,39 +31,33 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password, firstName, lastName, phone } = req.body;
+      const { email, password, name, phone } = req.body;
 
       // Check if user exists
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
-        return res.status(400).json({ error: 'Email already registered' });
+        return res.status(400).json({ error: 'User already exists' });
       }
-
-      // Create verification token
-      const verificationToken = crypto.randomBytes(32).toString('hex');
 
       // Create user
       const user = await User.create({
         email,
         password,
-        firstName,
-        lastName,
+        name,
         phone,
-        verificationToken,
+        role: 'user',
       });
 
-      // Generate tokens
-      const { accessToken, refreshToken } = generateTokens(user.id);
+      const token = generateToken(user);
 
       res.status(201).json({
         message: 'User registered successfully',
+        token,
         user: user.toJSON(),
-        accessToken,
-        refreshToken,
       });
     } catch (error) {
       console.error('Registration error:', error);
-      res.status(500).json({ error: 'Server error during registration' });
+      res.status(500).json({ error: 'Registration failed' });
     }
   }
 );
@@ -86,8 +68,8 @@ router.post(
 router.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password').notEmpty().withMessage('Password is required'),
+    body('email').isEmail().normalizeEmail(),
+    body('password').notEmpty(),
   ],
   async (req, res) => {
     try {
@@ -110,169 +92,54 @@ router.post(
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      // Check if user is active
-      if (!user.isActive) {
-        return res.status(403).json({ error: 'Account is deactivated' });
-      }
-
       // Update last login
-      await user.update({ lastLogin: new Date() });
+      user.lastLogin = new Date();
+      await user.save();
 
-      // Generate tokens
-      const { accessToken, refreshToken } = generateTokens(user.id);
+      const token = generateToken(user);
 
       res.json({
         message: 'Login successful',
+        token,
         user: user.toJSON(),
-        accessToken,
-        refreshToken,
       });
     } catch (error) {
       console.error('Login error:', error);
-      res.status(500).json({ error: 'Server error during login' });
+      res.status(500).json({ error: 'Login failed' });
     }
   }
 );
-
-// @route   POST /api/auth/refresh
-// @desc    Refresh access token
-// @access  Public
-router.post('/refresh', async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-      return res.status(401).json({ error: 'Refresh token required' });
-    }
-
-    const decoded = jwt.verify(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET
-    );
-
-    const user = await User.findByPk(decoded.userId);
-    if (!user || !user.isActive) {
-      return res.status(403).json({ error: 'Invalid refresh token' });
-    }
-
-    const { accessToken, refreshToken: newRefreshToken } = generateTokens(user.id);
-
-    res.json({
-      accessToken,
-      refreshToken: newRefreshToken,
-    });
-  } catch (error) {
-    res.status(403).json({ error: 'Invalid refresh token' });
-  }
-});
 
 // @route   GET /api/auth/me
 // @desc    Get current user
 // @access  Private
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    res.json({ user: req.user });
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user.toJSON());
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Get user error:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
 
 // @route   POST /api/auth/logout
-// @desc    Logout user
+// @desc    Logout user (set offline)
 // @access  Private
-router.post('/logout', authenticateToken, async (req, res) => {
+router.post('/logout', authMiddleware, async (req, res) => {
   try {
+    const user = await User.findByPk(req.user.id);
+    if (user) {
+      await user.setOffline();
+    }
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
   }
 });
-
-// @route   POST /api/auth/forgot-password
-// @desc    Request password reset
-// @access  Public
-router.post(
-  '/forgot-password',
-  [body('email').isEmail().withMessage('Please provide a valid email')],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { email } = req.body;
-      const user = await User.findOne({ where: { email } });
-
-      if (!user) {
-        // Don't reveal if user exists
-        return res.json({ message: 'If email exists, reset link sent' });
-      }
-
-      // Generate reset token
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      const resetExpires = new Date(Date.now() + 3600000); // 1 hour
-
-      await user.update({
-        resetPasswordToken: resetToken,
-        resetPasswordExpires: resetExpires,
-      });
-
-      // TODO: Send email with reset link
-      // const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-
-      res.json({ message: 'Password reset link sent to email' });
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  }
-);
-
-// @route   POST /api/auth/reset-password
-// @desc    Reset password
-// @access  Public
-router.post(
-  '/reset-password',
-  [
-    body('token').notEmpty().withMessage('Reset token is required'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters'),
-  ],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { token, password } = req.body;
-
-      const user = await User.findOne({
-        where: {
-          resetPasswordToken: token,
-          resetPasswordExpires: { [require('sequelize').Op.gt]: new Date() },
-        },
-      });
-
-      if (!user) {
-        return res.status(400).json({ error: 'Invalid or expired reset token' });
-      }
-
-      // Update password
-      await user.update({
-        password,
-        resetPasswordToken: null,
-        resetPasswordExpires: null,
-      });
-
-      res.json({ message: 'Password reset successful' });
-    } catch (error) {
-      console.error('Reset password error:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  }
-);
 
 module.exports = router;

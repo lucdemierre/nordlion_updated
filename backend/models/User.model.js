@@ -20,51 +20,92 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  firstName: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  firstName: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return this.name.split(' ')[0];
+    },
+  },
   lastName: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: DataTypes.VIRTUAL,
+    get() {
+      const parts = this.name.split(' ');
+      return parts.slice(1).join(' ');
+    },
   },
   phone: {
     type: DataTypes.STRING,
   },
   role: {
-    type: DataTypes.ENUM('user', 'admin', 'superadmin'),
+    type: DataTypes.ENUM('user', 'admin', 'dealer'),
     defaultValue: 'user',
   },
   avatar: {
     type: DataTypes.STRING,
   },
   address: {
-    type: DataTypes.JSON,
+    type: DataTypes.JSONB,
     defaultValue: {},
   },
   preferences: {
-    type: DataTypes.JSON,
-    defaultValue: {},
+    type: DataTypes.JSONB,
+    defaultValue: {
+      notifications: true,
+      newsletter: false,
+      language: 'en',
+      currency: 'GBP',
+    },
   },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  // NEW: Online status tracking
+  isOnline: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  lastSeenAt: {
+    type: DataTypes.DATE,
+  },
   lastLogin: {
     type: DataTypes.DATE,
   },
-  emailVerified: {
+  // Email verification
+  verified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
   verificationToken: {
     type: DataTypes.STRING,
   },
+  // Password reset
   resetPasswordToken: {
     type: DataTypes.STRING,
   },
   resetPasswordExpires: {
     type: DataTypes.DATE,
+  },
+  // Security
+  twoFactorEnabled: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  twoFactorSecret: {
+    type: DataTypes.STRING,
+  },
+  // Stats
+  totalPurchases: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  totalSpent: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0,
   },
 }, {
   hooks: {
@@ -81,10 +122,28 @@ const User = sequelize.define('User', {
       }
     },
   },
+  indexes: [
+    { fields: ['email'] },
+    { fields: ['role'] },
+    { fields: ['isOnline'] },
+    { fields: ['isActive'] },
+  ],
 });
 
 User.prototype.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+User.prototype.setOnline = async function() {
+  this.isOnline = true;
+  this.lastSeenAt = new Date();
+  await this.save();
+};
+
+User.prototype.setOffline = async function() {
+  this.isOnline = false;
+  this.lastSeenAt = new Date();
+  await this.save();
 };
 
 User.prototype.toJSON = function() {
@@ -93,6 +152,7 @@ User.prototype.toJSON = function() {
   delete values.verificationToken;
   delete values.resetPasswordToken;
   delete values.resetPasswordExpires;
+  delete values.twoFactorSecret;
   return values;
 };
 

@@ -1,96 +1,151 @@
 const express = require('express');
 const router = express.Router();
-const { body, validationResult } = require('express-validator');
-const { User, Order, Review } = require('../models');
-const { authenticateToken } = require('../middleware/auth.middleware');
+const User = require('../models/User.model');
+const Order = require('../models/Order.model');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
+const { Op } = require('sequelize');
 
-// @route   GET /api/users/profile
-// @desc    Get user profile
-// @access  Private
-router.get('/profile', authenticateToken, async (req, res) => {
+// @route   GET /api/users
+// @desc    Get all users (admin only)
+// @access  Private/Admin
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
+    const { page = 1, limit = 20, search, role, isOnline } = req.query;
+
+    const where = {};
+    
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { email: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (isOnline !== undefined) {
+      where.isOnline = isOnline === 'true';
+    }
+
+    const { count, rows } = await User.findAndCountAll({
+      where,
+      limit: parseInt(limit),
+      offset: (page - 1) * limit,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: ['password', 'verificationToken', 'resetPasswordToken'] },
+    });
+
+    res.json({
+      users: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        pages: Math.ceil(count / limit),
+      },
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// @route   GET /api/users/online
+// @desc    Get online users
+// @access  Private
+router.get('/online', authMiddleware, async (req, res) => {
+  try {
+    const users = await User.findAll({
+      where: { isOnline: true },
+      attributes: ['id', 'name', 'avatar', 'role', 'lastSeenAt'],
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Get online users error:', error);
+    res.status(500).json({ error: 'Failed to fetch online users' });
+  }
+});
+
+// @route   GET /api/users/:id
+// @desc    Get user by ID
+// @access  Private
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: { exclude: ['password', 'verificationToken', 'resetPasswordToken'] },
       include: [
-        { model: Order, as: 'orders' },
-        { model: Review, as: 'reviews' },
+        {
+          model: Order,
+          limit: 5,
+          order: [['createdAt', 'DESC']],
+        },
       ],
     });
-    res.json({ user });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
-// @route   PUT /api/users/profile
-// @desc    Update user profile
-// @access  Private
-router.put('/profile', authenticateToken, async (req, res) => {
-  try {
-    const { firstName, lastName, phone, address, preferences } = req.body;
-    
-    const user = await User.findByPk(req.user.id);
-    await user.update({
-      firstName,
-      lastName,
-      phone,
-      address,
-      preferences,
-    });
-
-    res.json({ message: 'Profile updated successfully', user });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// @route   PUT /api/users/password
-// @desc    Change password
-// @access  Private
-router.put(
-  '/password',
-  authenticateToken,
-  [
-    body('currentPassword').notEmpty().withMessage('Current password required'),
-    body('newPassword')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters'),
-  ],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { currentPassword, newPassword } = req.body;
-      const user = await User.findByPk(req.user.id);
-
-      const isMatch = await user.comparePassword(currentPassword);
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Current password incorrect' });
-      }
-
-      await user.update({ password: newPassword });
-      res.json({ message: 'Password updated successfully' });
-    } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  }
-);
 
-// @route   GET /api/users/orders
-// @desc    Get user orders
-// @access  Private
-router.get('/orders', authenticateToken, async (req, res) => {
-  try {
-    const orders = await Order.findAll({
-      where: { userId: req.user.id },
-      include: ['vehicle'],
-      order: [['createdAt', 'DESC']],
-    });
-    res.json({ orders });
+    res.json(user);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Get user error:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+// @route   PUT /api/users/:id
+// @desc    Update user
+// @access  Private
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Users can only update their own profile, admins can update anyone
+    if (req.user.id !== id && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { name, phone, avatar, address, preferences } = req.body;
+
+    await user.update({
+      ...(name && { name }),
+      ...(phone && { phone }),
+      ...(avatar && { avatar }),
+      ...(address && { address }),
+      ...(preferences && { preferences }),
+    });
+
+    res.json({
+      message: 'User updated successfully',
+      user: user.toJSON(),
+    });
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// @route   DELETE /api/users/:id
+// @desc    Delete user (admin only)
+// @access  Private/Admin
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.destroy();
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 

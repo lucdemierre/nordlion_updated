@@ -16,8 +16,8 @@ import {
   BarChart3,
   UserCircle,
   LogOut,
-  ChevronRight,
   Home,
+  Car,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -44,8 +44,10 @@ const navigationConfig = {
   admin: [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Users, label: 'Users', path: '/admin/users' },
-    { icon: Package, label: 'Vehicles', path: '/admin/vehicles' },
-    { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
+    { icon: Car, label: 'Vehicles', path: '/admin/vehicles' },
+    { icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
+    { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
+    { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
     { icon: UserCircle, label: 'Profile', path: '/admin/profile' },
   ],
 }
@@ -70,7 +72,6 @@ export default function Sidebar({ role }: SidebarProps) {
       onMouseLeave={() => setIsExpanded(false)}
     >
       <div className="flex flex-col h-full">
-        {/* Logo */}
         <div className="h-16 flex items-center justify-center border-b border-white/5">
           <div className={`transition-all duration-300 ${
             isExpanded ? 'opacity-100' : 'opacity-0 w-0'
@@ -84,7 +85,6 @@ export default function Sidebar({ role }: SidebarProps) {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const Icon = item.icon
@@ -112,7 +112,6 @@ export default function Sidebar({ role }: SidebarProps) {
           })}
         </nav>
 
-        {/* Logout */}
         <div className="p-3 border-t border-white/5">
           <button
             onClick={handleLogout}

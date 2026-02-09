@@ -1,447 +1,335 @@
-# 🦁 NordLion - Enterprise Luxury Automotive Platform
+# 🦁 NordLion - Luxury Automotive Platform
 
-> A full-stack, production-ready luxury automotive marketplace inspired by Elita, featuring modern animations, comprehensive admin/user dashboards, and enterprise-grade architecture.
+> Enterprise-grade luxury vehicle marketplace with real-time messaging, order management, and analytics.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.1.0-black.svg)](https://nextjs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18.2-green.svg)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue.svg)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## ✨ Features
 
----
-
-## 🌟 Features
-
-### 🎨 Frontend Excellence
-- **Modern Design System**: Elita-inspired UI with luxury color scheme
-- **Smooth Animations**: Framer Motion powered transitions and micro-interactions
-- **Responsive Layout**: Mobile-first design that works on all devices
-- **Dark/Light Mode**: System preference-aware theming
-- **Optimized Performance**: Next.js 14 with App Router for lightning-fast loads
-
-### 🛠️ Admin Dashboard
-- **Real-time Analytics**: Revenue tracking, sales metrics, user engagement
-- **Vehicle Management**: Complete CRUD operations for inventory
-- **Order Management**: Track and manage customer orders
-- **User Administration**: Manage customers and permissions
-- **Interactive Charts**: Beautiful data visualizations
-
-### 👤 User Dashboard
-- **Order Tracking**: Real-time order status updates
-- **Saved Vehicles**: Wishlist functionality
-- **Purchase History**: Complete transaction records
-- **Profile Management**: Update personal information
-- **24/7 Support Access**: Integrated concierge service
-
-### 🔒 Enterprise Backend
-- **RESTful API**: Clean, documented endpoints
-- **JWT Authentication**: Secure token-based auth with refresh tokens
-- **Role-Based Access**: Granular permission system
-- **Data Validation**: Comprehensive input sanitization
-- **Error Handling**: Graceful error management
-
-### 📈 Production Ready
-- **TypeScript**: End-to-end type safety
-- **PostgreSQL**: Robust relational database
-- **Sequelize ORM**: Type-safe database operations
-- **API Documentation**: Complete endpoint reference
-- **Deployment Guides**: Step-by-step production deployment
-
----
+- 🚗 **Vehicle Management** - Full CRUD for luxury vehicles
+- 👥 **User Management** - Admin, Dealer, and Client roles
+- 📊 **Analytics Dashboard** - Revenue, sales, and performance metrics
+- 💬 **Real-time Messaging** - Socket.IO powered chat system
+- 🛒 **Order Management** - Complete order lifecycle tracking
+- 🎨 **Modern UI** - Dark theme with smooth animations
+- 🔐 **Secure Authentication** - JWT-based auth system
+- 📱 **Responsive Design** - Works on all devices
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18.17.0 or higher
-- PostgreSQL 14 or higher
-- npm 9.6.7 or higher
+
+- Node.js 18+
+- PostgreSQL 14+ (PGAdmin 4)
+- npm or yarn
 
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/lucdemierre/nordlion_updated.git
 cd nordlion_updated
 
-# Run automated setup
-npm run setup
-
-# Or manual installation
+# Install dependencies
 npm install
-cp .env.example .env
-# Edit .env with your configuration
-
-# Create database
-psql -U postgres -c "CREATE DATABASE nordlion_db;"
+cd backend && npm install && cd ..
 ```
 
-### Development
+### Database Setup
 
-**Start both frontend and backend:**
-```bash
-npm run dev:all
+1. **Create database in PGAdmin:**
+   - Open PGAdmin 4
+   - Right-click "Databases" > Create > Database
+   - Name: `nordlion_db`
+   - Click Save
+
+2. **Configure environment:**
+
+Create `.env` in root directory:
+
+```env
+# Database (Update with YOUR credentials)
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/nordlion_db
+
+# JWT Secret
+JWT_SECRET=your-super-secret-jwt-key-min-32-characters-long
+
+# Backend
+PORT=3001
+NODE_ENV=development
+
+# Frontend
+FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-**Or start individually:**
+3. **Check database connection:**
 
 ```bash
-# Terminal 1 - Backend (port 3001)
-npm run server:dev
+node scripts/check-database.js
+```
 
-# Terminal 2 - Frontend (port 3000)
+You should see:
+```
+✅ Database connection successful!
+✅ Found tables
+🎉 Database Status: HEALTHY
+```
+
+4. **Seed database:**
+
+```bash
+node scripts/seed-database.js
+```
+
+This creates:
+- ✅ 5 users (admin, users, dealer)
+- ✅ 10 luxury vehicles (Ferrari, Lamborghini, Bugatti, Pagani, etc.)
+- ✅ 3 complete orders
+- ✅ 4 customer reviews
+- ✅ 6 message conversations
+
+### Run Application
+
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run dev
+
+# Terminal 2 - Frontend
 npm run dev
 ```
 
-**Access the application:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
-- Admin Dashboard: http://localhost:3000/admin
-- User Dashboard: http://localhost:3000/dashboard
+### Login
 
----
+Go to http://localhost:3000 and login:
 
-## 📚 Documentation
+- **Admin**: admin@nordlion.com / Admin123!@#
+- **User**: john.hamilton@example.com / User123!@#
+- **Dealer**: dealer@elitecars.com / Dealer123!@#
 
-- **[Setup Guide](SETUP.md)** - Complete installation and configuration
-- **[Architecture](ARCHITECTURE.md)** - System design and technical details
-- **[Contributing](CONTRIBUTING.md)** - Contribution guidelines
-- **[API Documentation](docs/API.md)** - Endpoint reference (coming soon)
-
----
-
-## 📱 Project Structure
+## 📁 Project Structure
 
 ```
 nordlion_updated/
-├── src/                        # Frontend source
-│   ├── app/                   # Next.js pages (App Router)
-│   │   ├── page.tsx          # Homepage
-│   │   ├── admin/            # Admin dashboard
-│   │   ├── dashboard/        # User dashboard
-│   │   └── vehicles/         # Vehicle pages
-│   ├── components/           # React components
-│   │   ├── home/            # Homepage sections
-│   │   ├── layout/          # Layout components
-│   │   └── ui/              # Reusable UI
-│   └── lib/                  # Utilities
-│
-├── server/                    # Backend API
-│   ├── config/               # Configuration
-│   ├── controllers/          # Route handlers
-│   ├── middleware/           # Express middleware
-│   ├── models/               # Database models
-│   ├── routes/               # API routes
-│   └── index.ts              # Server entry
-│
-├── public/                    # Static assets
-├── scripts/                   # Utility scripts
-└── docs/                      # Documentation
+├── src/
+│   ├── app/
+│   │   ├── admin/          # Admin dashboard pages
+│   │   │   ├── page.tsx    # Dashboard with stats
+│   │   │   ├── users/      # User management
+│   │   │   ├── vehicles/   # Vehicle CRUD (Add/Edit/View/Delete)
+│   │   │   ├── orders/     # Order management
+│   │   │   ├── messages/   # Real-time messaging
+│   │   │   └── analytics/  # Analytics with charts
+│   │   ├── client/         # Client dashboard
+│   │   ├── broker/         # Broker dashboard
+│   │   └── auth/           # Authentication pages
+│   ├── components/
+│   │   └── Sidebar.tsx     # Universal sidebar component
+│   └── lib/
+│       └── auth.ts         # Auth utilities
+├── backend/
+│   ├── server.js           # Express + Socket.IO server
+│   ├── models/             # Sequelize models
+│   ├── routes/             # API routes
+│   ├── controllers/        # Business logic
+│   └── middleware/         # Auth & validation
+├── scripts/
+│   ├── seed-database.js    # Database seeder
+│   └── check-database.js   # Database health check
+└── docs/
+    ├── SETUP_GUIDE.md      # Detailed setup instructions
+    └── API_INTEGRATION.md  # API integration guide
 ```
 
----
+## 🎯 What's Working
 
-## 🎨 Design System
+### ✅ Admin Dashboard
+- Single sidebar (no duplicates!)
+- Real-time statistics
+- Revenue tracking
+- Order summaries
+- Top performing vehicles
 
-### Color Palette
+### ✅ Vehicle Management
+- **View all vehicles** with status filters
+- **Add new vehicles** with complete details
+- **Edit vehicles** with modal form
+- **View details** in beautiful modal
+- **Delete vehicles** with confirmation
+- Search and filter functionality
+- Featured vehicle toggle
 
-**Primary Colors:**
-- Primary: `#0ea5e9` (Sky Blue)
-- Accent: `#eab308` (Gold)
-- Dark: `#0f172a` (Slate)
+### ✅ Analytics Page
+- Interactive charts (Line, Bar, Doughnut)
+- Revenue trends over time
+- Sales by month visualization
+- Order status breakdown
+- Vehicles by make distribution
+- Top performing vehicles table
+- Quick stats sidebar
+- Time range filters (7d, 30d, 90d, 1y)
 
-**Semantic Colors:**
-- Success: `#10b981`
-- Error: `#ef4444`
-- Warning: `#f59e0b`
-- Info: `#3b82f6`
+### ✅ User Management
+- List all users with roles
+- Search by name/email
+- Filter by role (admin, dealer, user)
+- Online status indicators
+- Order history and spending per user
+- Fixed scrolling (no overlap!)
 
-### Typography
-- **Font Family**: Inter, system-ui, sans-serif
-- **Headings**: 700 weight, tight line-height
-- **Body**: 400 weight, 1.5 line-height
+### ✅ Messaging System
+- Conversations list with search
+- Messages load properly when switching chats
+- Real-time message sending
+- Online/offline status
+- Unread message counts
+- Typing indicators ready
 
-### Components
-- Glass-morphism effects
-- Smooth hover transitions
-- Consistent spacing system (8px grid)
-- Accessible contrast ratios
+### ✅ Order Management
+- Individual order detail pages
+- Complete vehicle and customer information
+- Payment status tracking
+- Delivery address display
+- Order timeline with updates
 
----
+## 📊 Database Tables
 
-## 📦 Tech Stack
+| Table | Records | Description |
+|-------|---------|-------------|
+| Users | 5 | Admin, users, dealer accounts |
+| Vehicles | 10 | Luxury cars (Ferrari, Lamborghini, Bugatti, etc.) |
+| Orders | 3 | Complete order records |
+| Reviews | 4 | Customer reviews |
+| Messages | 6 | Real-time conversations |
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 14.1.0
-- **Language**: TypeScript 5.3.3
-- **Styling**: Tailwind CSS 3.4.1
-- **Animations**: Framer Motion 11.0.5
-- **Charts**: Recharts 2.10.4
-- **Icons**: Lucide React 0.344.0
+- **Next.js 14** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Framer Motion** - Animations
+- **Lucide Icons** - Icon library
+- **Chart.js** - Data visualization
+- **React Chart.js 2** - React wrapper for Chart.js
 
 ### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js 4.18.2
-- **Language**: TypeScript 5.3.3
-- **ORM**: Sequelize 6.35.2
-- **Authentication**: JWT + bcrypt
-- **Validation**: express-validator
+- **Node.js** - Runtime
+- **Express** - Web framework
+- **Sequelize** - ORM
+- **PostgreSQL** - Database
+- **Socket.IO** - Real-time messaging
+- **JWT** - Authentication
+- **Bcrypt** - Password hashing
 
-### Database
-- **DBMS**: PostgreSQL 14+
-- **Features**: JSONB, Full-text search, Indexes
-
-### DevOps
-- **Version Control**: Git + GitHub
-- **Deployment**: Vercel (Frontend) + Railway (Backend)
-- **CI/CD**: GitHub Actions (optional)
-
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/nordlion_db
-
-# API
-API_URL=http://localhost:3001
-NEXT_PUBLIC_API_URL=http://localhost:3001
-
-# JWT Secrets (Generate new ones for production!)
-JWT_SECRET=your-super-secret-jwt-key-min-32-characters-long
-REFRESH_TOKEN_SECRET=your-refresh-secret-key-min-32-characters
-NEXTAUTH_SECRET=your-nextauth-secret-key-min-32-characters
-
-# URLs
-NEXTAUTH_URL=http://localhost:3000
-CLIENT_URL=http://localhost:3000
-
-# Environment
-NODE_ENV=development
-PORT=3001
-```
-
-**Generate secure secrets:**
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
----
-
-## 📡 API Endpoints
-
-### Authentication
-```
-POST   /api/auth/register    Register new user
-POST   /api/auth/login       Login user
-POST   /api/auth/refresh     Refresh access token
-GET    /api/auth/me          Get current user
-```
-
-### Vehicles
-```
-GET    /api/vehicles         List all vehicles
-GET    /api/vehicles/:id     Get vehicle details
-POST   /api/vehicles         Create vehicle (admin)
-PUT    /api/vehicles/:id     Update vehicle (admin)
-DELETE /api/vehicles/:id     Delete vehicle (admin)
-```
-
-### Orders
-```
-GET    /api/orders           List user orders
-GET    /api/orders/:id       Get order details
-POST   /api/orders           Create order
-PUT    /api/orders/:id       Update order (admin)
-```
-
-See [API Documentation](docs/API.md) for complete reference.
-
----
-
-## 🛠️ Development
-
-### Available Scripts
+## 🔧 Available Scripts
 
 ```bash
-# Development
-npm run dev              # Start frontend
-npm run server:dev       # Start backend
-npm run dev:all          # Start both
+# Check if database is working
+node scripts/check-database.js
 
-# Building
-npm run build            # Build frontend
-npm run server:build     # Build backend
+# Seed database with sample data
+node scripts/seed-database.js
 
-# Production
-npm start                # Run frontend production
-npm run server           # Run backend production
+# Start backend (port 3001)
+cd backend && npm run dev
 
-# Utilities
-npm run lint             # Lint code
-npm run format           # Format code
-npm run type-check       # TypeScript check
-npm test                 # Run tests
+# Start frontend (port 3000)
+npm run dev
+
+# Build for production
+npm run build
+
+# Run production build
+npm start
 ```
 
-### Code Quality
+## 🐛 Troubleshooting
+
+### Database Connection Failed
 
 ```bash
-# Linting
-npm run lint
-npm run lint:fix
+# Check if PostgreSQL is running
+pg_isready
 
-# Type checking
-npm run type-check
+# Verify database exists
+psql -U postgres -l | grep nordlion
 
-# Testing
-npm test
-npm run test:watch
+# Create database if missing
+psql -U postgres -c "CREATE DATABASE nordlion_db;"
 ```
 
----
+### Port Already in Use
 
-## 🚀 Deployment
+```bash
+# Kill process on port 3001 (backend)
+lsof -ti:3001 | xargs kill -9
 
-### Vercel (Frontend)
+# Kill process on port 3000 (frontend)
+lsof -ti:3000 | xargs kill -9
+```
 
-1. Push code to GitHub
-2. Import project in Vercel
-3. Configure environment variables
-4. Deploy
+### Still Seeing Two Sidebars
 
-### Railway (Backend)
+```bash
+# Clear Next.js cache
+rm -rf .next
 
-1. Create Railway account
-2. New project from GitHub
-3. Add PostgreSQL database
-4. Set environment variables
-5. Deploy
+# Restart dev server
+npm run dev
+```
 
-**Detailed guides**: See [SETUP.md](SETUP.md)
+### No Data Showing
 
----
+```bash
+# Run seed script
+node scripts/seed-database.js
 
-## 🔒 Security
+# If errors, reset database
+psql -U postgres -c "DROP DATABASE nordlion_db;"
+psql -U postgres -c "CREATE DATABASE nordlion_db;"
+node scripts/seed-database.js
+```
 
-- JWT-based authentication
-- Password hashing with bcrypt
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-- CORS configuration
-- Rate limiting
-- Security headers (Helmet.js)
+## 📈 What's Next
 
----
+### Phase 1 (Current Week)
+- [x] Single sidebar implementation
+- [x] Analytics page with charts
+- [x] Full vehicle CRUD
+- [x] Database health check
+- [ ] Connect frontend to backend API
+- [ ] Real-time Socket.IO integration
 
-## 📊 Performance
-
-- Server-side rendering (SSR)
-- Image optimization
-- Code splitting
-- Database indexing
-- Response caching
-- Connection pooling
-
-**Lighthouse Score Target**: 90+
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 🐛 Known Issues
-
-- [ ] Image uploads need S3 integration
-- [ ] Email notifications pending SMTP setup
-- [ ] Payment processing needs Stripe configuration
-
----
-
-## 🛝v️ Roadmap
-
-### Phase 1 (Current)
-- [x] Core frontend structure
-- [x] Backend API
-- [x] Admin dashboard
-- [x] User dashboard
-- [x] Authentication system
-
-### Phase 2 (Next)
-- [ ] Payment integration (Stripe)
+### Phase 2 (Next 2 Weeks)
+- [ ] Stripe payment integration
 - [ ] Email notifications
-- [ ] Image upload to S3
 - [ ] Advanced search filters
-- [ ] Real-time notifications
+- [ ] Image upload to cloud storage
+- [ ] Order invoices (PDF generation)
 
-### Phase 3 (Future)
+### Phase 3 (Month 2)
 - [ ] Mobile app (React Native)
-- [ ] Advanced analytics
-- [ ] Multi-language support
+- [ ] Push notifications
+- [ ] 360° vehicle views
+- [ ] Virtual showroom
 - [ ] AI-powered recommendations
-
----
-
-## 📞 Support
-
-- **Email**: support@nordlionauto.com
-- **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/lucdemierre/nordlion_updated/issues)
-
----
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Private - NordLion © 2026
+
+## 🤝 Contributing
+
+This is a private project. Contact admin for access.
+
+## 📞 Support
+
+For issues or questions:
+1. Check [SETUP_GUIDE.md](./SETUP_GUIDE.md)
+2. Run database health check: `node scripts/check-database.js`
+3. Check browser console for errors
+4. Verify both servers are running
 
 ---
 
-## 🙏 Acknowledgments
-
-- Inspired by [Elita](https://elita.net)
-- Design influenced by modern luxury automotive brands
-- Built with love for car enthusiasts
-
----
-
-## 📸 Screenshots
-
-### Homepage
-![Homepage](docs/screenshots/homepage.png)
-
-### Admin Dashboard
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-### User Dashboard
-![User Dashboard](docs/screenshots/user-dashboard.png)
-
-### Vehicle Listing
-![Vehicle Listing](docs/screenshots/vehicles.png)
-
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=lucdemierre/nordlion_updated&type=Date)](https://star-history.com/#lucdemierre/nordlion_updated&Date)
-
----
-
-<div align="center">
-
-**Made with ❤️ by the NordLion Team**
-
-[Website](https://nordlionauto.com) • [Documentation](docs/) • [Issues](https://github.com/lucdemierre/nordlion_updated/issues)
-
-</div>
+**Built with ❤️ for luxury automotive excellence**

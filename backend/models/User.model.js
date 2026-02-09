@@ -64,7 +64,6 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
-  // NEW: Online status tracking
   isOnline: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -75,7 +74,6 @@ const User = sequelize.define('User', {
   lastLogin: {
     type: DataTypes.DATE,
   },
-  // Email verification
   verified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -83,14 +81,12 @@ const User = sequelize.define('User', {
   verificationToken: {
     type: DataTypes.STRING,
   },
-  // Password reset
   resetPasswordToken: {
     type: DataTypes.STRING,
   },
   resetPasswordExpires: {
     type: DataTypes.DATE,
   },
-  // Security
   twoFactorEnabled: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -98,7 +94,6 @@ const User = sequelize.define('User', {
   twoFactorSecret: {
     type: DataTypes.STRING,
   },
-  // Stats
   totalPurchases: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
@@ -125,9 +120,10 @@ const User = sequelize.define('User', {
   indexes: [
     { fields: ['email'] },
     { fields: ['role'] },
-    { fields: ['isOnline'] },
-    { fields: ['isActive'] },
+    { fields: ['is_online'] }, // Use snake_case for database column
+    { fields: ['is_active'] }, // Use snake_case for database column
   ],
+  underscored: true, // This ensures Sequelize uses snake_case in DB
 });
 
 User.prototype.comparePassword = async function(candidatePassword) {

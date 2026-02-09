@@ -41,7 +41,7 @@ const seedDatabase = async () => {
     await sequelize.sync({ force: true });
     console.log('✅ Database schema synced!\n');
 
-    // Seed Users (passwords already hashed in model hooks, but we hash here to bypass hooks)
+    // Seed Users - ONLY REAL ADMIN
     console.log('👥 Seeding users...');
     const users = await User.bulkCreate([
       {
@@ -51,62 +51,14 @@ const seedDatabase = async () => {
         name: 'Luc Demierre',
         phone: '+44 20 7946 0958',
         role: 'admin',
-        isOnline: true,
+        isOnline: false, // Will be set to true when actually logged in
         verified: true,
         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Luc',
       },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440002',
-        email: 'john.hamilton@example.com',
-        password: await bcrypt.hash('User123!@#', 10),
-        name: 'John Hamilton',
-        phone: '+44 20 7946 0123',
-        role: 'user',
-        isOnline: false,
-        verified: true,
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-        totalPurchases: 2,
-        totalSpent: 555000,
-      },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440003',
-        email: 'sarah.chen@example.com',
-        password: await bcrypt.hash('User123!@#', 10),
-        name: 'Sarah Chen',
-        phone: '+44 20 7946 0456',
-        role: 'user',
-        isOnline: true,
-        verified: true,
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-        totalPurchases: 1,
-        totalSpent: 325000,
-      },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440004',
-        email: 'dealer@elitecars.com',
-        password: await bcrypt.hash('Dealer123!@#', 10),
-        name: 'Elite Cars London',
-        phone: '+44 20 7946 0789',
-        role: 'dealer',
-        isOnline: false,
-        verified: true,
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elite',
-      },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440005',
-        email: 'michael.sterling@example.com',
-        password: await bcrypt.hash('User123!@#', 10),
-        name: 'Michael Sterling',
-        phone: '+44 20 7946 0321',
-        role: 'user',
-        isOnline: false,
-        verified: true,
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-      },
-    ], { individualHooks: false }); // Skip model hooks since we pre-hash
-    console.log(`✅ Created ${users.length} users\n`);
+    ], { individualHooks: false });
+    console.log(`✅ Created ${users.length} user (admin only)\n`);
 
-    // Seed Vehicles
+    // Seed Vehicles - Real luxury cars with proper details
     console.log('🚗 Seeding luxury vehicles...');
     const vehicles = await Vehicle.bulkCreate([
       {
@@ -126,13 +78,13 @@ const seedDatabase = async () => {
         horsepower: 830,
         torque: 740,
         images: [
-          'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800',
-          'https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800',
+          'https://www.ferrari.com/content/dam/ferrari/common/navigation/granturismo/296-gtb/ferrari-296-gtb-granturismo-navigation-01.jpg',
+          'https://www.ferrari.com/content/dam/ferrari/common/navigation/granturismo/296-gtb/ferrari-296-gtb-granturismo-navigation-02.jpg',
         ],
-        features: ['Carbon Fiber', 'ADAS', 'Apple CarPlay', 'Premium Sound'],
-        description: 'The 296 GTB redefines the concept of driving pleasure with its V6 hybrid powertrain. F1 DCT transmission.',
+        features: ['F1 DCT Transmission', 'Hybrid V6 Powertrain', 'Carbon Fiber Package', 'ADAS', 'Apple CarPlay'],
+        description: 'The 296 GTB redefines the concept of driving pleasure with its V6 hybrid powertrain. Revolutionary F1-derived DCT transmission delivers 830 hp.',
         location: 'London, UK',
-        views: 1247,
+        views: 0,
         isFeatured: true,
       },
       {
@@ -152,13 +104,13 @@ const seedDatabase = async () => {
         horsepower: 1015,
         torque: 807,
         images: [
-          'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800',
-          'https://images.unsplash.com/photo-1621135802920-1734c8c4b75f?w=800',
+          'https://www.lamborghini.com/sites/it-en/files/DAM/lamborghini/facelift_2019/model_gw/revuelto/2024/02_09/gate_01.jpg',
+          'https://www.lamborghini.com/sites/it-en/files/DAM/lamborghini/facelift_2019/model_gw/revuelto/2024/02_09/gate_02.jpg',
         ],
-        features: ['LDVI 2.0', 'Carbon Fiber Monocoque', 'Active Aero', '4WD'],
-        description: 'The first super sports V12 hybrid plug-in HPEV. Revolutionary performance with 8-Speed DCT.',
+        features: ['LDVI 2.0', 'Carbon Fiber Monocoque', 'Active Aero', '4WD', '8-Speed DCT'],
+        description: 'The first super sports V12 HPEV (High Performance Electrified Vehicle). Revolutionary hybrid system with 1,015 hp and 9,500 rpm redline.',
         location: 'London, UK',
-        views: 2145,
+        views: 0,
         isFeatured: true,
       },
       {
@@ -170,7 +122,7 @@ const seedDatabase = async () => {
         mileage: 1500,
         vin: 'WP0AB2A99PS123456',
         condition: 'used',
-        status: 'sold',
+        status: 'available',
         color: 'GT Silver Metallic',
         transmission: 'automatic',
         fuelType: 'gasoline',
@@ -178,13 +130,13 @@ const seedDatabase = async () => {
         horsepower: 640,
         torque: 800,
         images: [
-          'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800',
-          'https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800',
+          'https://files.porsche.com/filestore/image/multimedia/none/992-tu-s-modelimage-sideshot/model/cfbb8ed3-1a15-11ea-80c7-005056bbdc38/porsche-model.png',
+          'https://files.porsche.com/filestore/image/multimedia/none/992-turbo-s-modelimage/model/930894f1-6214-11ea-80c8-005056bbdc38/porsche-model.png',
         ],
-        features: ['Sport Chrono', 'PASM', 'Rear Axle Steering', 'PDLS+'],
-        description: 'The benchmark sports car. Unmatched versatility and performance with 8-Speed PDK.',
+        features: ['Sport Chrono Package', 'PASM', 'Rear Axle Steering', 'PDLS+', '8-Speed PDK'],
+        description: 'The benchmark sports car. Unmatched versatility and performance with 640 hp twin-turbo flat-six and PDK transmission.',
         location: 'Manchester, UK',
-        views: 3421,
+        views: 0,
         isFeatured: false,
       },
       {
@@ -204,13 +156,13 @@ const seedDatabase = async () => {
         horsepower: 750,
         torque: 800,
         images: [
-          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-          'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800',
+          'https://assets.oneweb.mercedes-benz.com/iris/iris.jpg?COSY-EU-100-1713d0VXqNFqtyO67PobkmP3eWru5GTEvrjOfHEDatRbhQCrrfrEfO1qbFv5au5kiEq0l3fallQy9xTpJ8cyWRi5g6lMn',
+          'https://assets.oneweb.mercedes-benz.com/iris/iris.jpg?COSY-EU-100-1713d0VXqNFqtyO67PobkmP3eWru5GTEvrjOfHEDatRbhQCrrfrEfO1qbFv5au5kiEq0l3fallQy9xTpJ8cyWRi5g6lMn',
         ],
-        features: ['Carbon Fiber Tub', 'ProActive Chassis', 'Drift Mode', 'Track Telemetry'],
-        description: 'Lighter. Faster. Sharper. The most powerful series-production McLaren supercar with 7-Speed SSG.',
+        features: ['Carbon Fiber Monocoque', 'ProActive Chassis Control', 'Track Mode', 'Drift Mode', '7-Speed SSG'],
+        description: 'Lighter. Faster. Sharper. The most powerful series-production McLaren supercar with 750 hp and revolutionary carbon fiber construction.',
         location: 'London, UK',
-        views: 1876,
+        views: 0,
         isFeatured: true,
       },
       {
@@ -230,13 +182,13 @@ const seedDatabase = async () => {
         horsepower: 770,
         torque: 900,
         images: [
-          'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800',
-          'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800',
+          'https://www.astonmartin.com/-/media/aston-martin/images/models/heritage-models/dbs-770-ultimate/gallery/am_dbs_770_ultimate_01.jpg',
+          'https://www.astonmartin.com/-/media/aston-martin/images/models/heritage-models/dbs-770-ultimate/gallery/am_dbs_770_ultimate_02.jpg',
         ],
-        features: ['Carbon Ceramic Brakes', 'Bang & Olufsen', 'Adaptive Damping', 'Carbon Fiber'],
-        description: 'The ultimate expression of DBS Superleggera. Breathtaking V12 performance with 8-Speed Auto.',
+        features: ['Carbon Ceramic Brakes', 'Bang & Olufsen Audio', 'Adaptive Damping', 'Carbon Fiber Bodywork'],
+        description: 'The ultimate expression of DBS Superleggera. Breathtaking V12 performance with 770 hp from the iconic 5.2L twin-turbo V12.',
         location: 'Birmingham, UK',
-        views: 1543,
+        views: 0,
         isFeatured: false,
       },
       {
@@ -248,7 +200,7 @@ const seedDatabase = async () => {
         mileage: 800,
         vin: 'SCBCA13W5PC123456',
         condition: 'used',
-        status: 'pending',
+        status: 'available',
         color: 'Beluga Black',
         transmission: 'automatic',
         fuelType: 'gasoline',
@@ -256,13 +208,13 @@ const seedDatabase = async () => {
         horsepower: 650,
         torque: 900,
         images: [
-          'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
-          'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800',
+          'https://www.bentleymotors.com/content/dam/bentley/Master/Models/Continental%20GT/Speed/MY24/Gallery/16x9/Continental_GT_Speed_03.jpg',
+          'https://www.bentleymotors.com/content/dam/bentley/Master/Models/Continental%20GT/Speed/MY24/Gallery/16x9/Continental_GT_Speed_02.jpg',
         ],
-        features: ['W12 Engine', 'Mulliner Spec', 'Naim Audio', '4-Seat Config'],
-        description: 'Grand touring perfection. Unrivaled luxury meets exhilarating performance with 8-Speed DCT.',
+        features: ['W12 Engine', 'Mulliner Specification', 'Naim for Bentley Audio', '4-Seat Configuration'],
+        description: 'Grand touring perfection. Unrivaled luxury meets exhilarating performance with the legendary 6.0L W12 producing 650 hp.',
         location: 'London, UK',
-        views: 987,
+        views: 0,
         isFeatured: false,
       },
       {
@@ -278,17 +230,17 @@ const seedDatabase = async () => {
         color: 'Tempest Grey',
         transmission: 'automatic',
         fuelType: 'electric',
-        engineSize: 'Electric Motor',
+        engineSize: 'Dual Electric Motors',
         horsepower: 577,
         torque: 900,
         images: [
-          'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800',
-          'https://images.unsplash.com/photo-1609881875668-87a81e8dc5d8?w=800',
+          'https://www.rolls-roycemotorcars.com/content/dam/rrmc/marketUK/rollsroycemotorcars_com/spectre/page-properties/RR_Spectre.jpg',
+          'https://www.rolls-roycemotorcars.com/content/dam/rrmc/marketUK/rollsroycemotorcars_com/spectre/page-properties/RR_Spectre_Interior.jpg',
         ],
-        features: ['102 kWh Battery', 'Starlight Headliner', 'Spirit of Ecstasy', 'Bespoke Audio'],
-        description: 'The first fully electric Rolls-Royce. Ultra-luxury redefined with Single-Speed transmission.',
+        features: ['102 kWh Battery', 'Starlight Headliner', 'Spirit of Ecstasy', 'Bespoke Audio System'],
+        description: 'The first fully electric Rolls-Royce. Ultra-luxury redefined with 577 hp and a 260-mile range. Single-speed electric transmission.',
         location: 'London, UK',
-        views: 2341,
+        views: 0,
         isFeatured: true,
       },
       {
@@ -308,13 +260,13 @@ const seedDatabase = async () => {
         horsepower: 720,
         torque: 800,
         images: [
-          'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
-          'https://images.unsplash.com/photo-1611821064430-4e34e13c25a5?w=800',
+          'https://assets.oneweb.mercedes-benz.com/iris/iris.jpg?COSY-EU-100-1713d0VXq0Q9ZF8BqfXqRpLOIDL3U5YALPE1LsxBieoQpJH',
+          'https://assets.oneweb.mercedes-benz.com/iris/iris.jpg?COSY-EU-100-1713d0VXq0Q9ZF8BqfXqRpLOIDL3U5YALPE1LsxBieoQpJH',
         ],
-        features: ['Flat-Plane Crank', 'Adjustable Coilovers', 'Aero Package', 'Track Modes'],
-        description: 'The most powerful AMG ever. Track-focused road-legal supercar with 7-Speed DCT.',
+        features: ['Flat-Plane Crank V8', 'Adjustable Coilover Suspension', 'Active Aero Package', 'Race Track Modes'],
+        description: 'The most powerful AMG ever. Track-focused road-legal supercar with 720 hp flat-plane crank V8 and 7-speed DCT.',
         location: 'Edinburgh, UK',
-        views: 1654,
+        views: 0,
         isFeatured: false,
       },
       {
@@ -334,183 +286,56 @@ const seedDatabase = async () => {
         horsepower: 1600,
         torque: 1600,
         images: [
-          'https://images.unsplash.com/photo-1566023888661-6d7a769f7ea2?w=800',
-          'https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=800',
+          'https://www.bugatti.com/media/news/2021/the-chiron-super-sport-300/Desktop_01.jpg',
+          'https://www.bugatti.com/media/news/2021/the-chiron-super-sport-300/Desktop_02.jpg',
         ],
-        features: ['Quad Turbo W16', 'All-Wheel Drive', 'Carbon Fiber Body', 'Luxury Interior'],
-        description: 'The pinnacle of automotive engineering. 1600hp of pure hypercar perfection with 7-Speed DSG.',
+        features: ['Quad-Turbo W16', 'All-Wheel Drive', 'Carbon Fiber Monocoque', 'Luxury Handcrafted Interior'],
+        description: 'The pinnacle of automotive engineering. 1,600 hp of pure hypercar perfection from the legendary W16 engine with 7-speed DSG.',
         location: 'London, UK',
-        views: 8934,
+        views: 0,
         isFeatured: true,
       },
       {
         id: '660e8400-e29b-41d4-a716-446655440010',
-        make: 'Pagani',
-        model: 'Huayra Roadster BC',
+        make: 'Koenigsegg',
+        model: 'CC850',
         year: 2023,
-        price: 3500000,
+        price: 3650000,
         mileage: 200,
         vin: 'ZN8PA20A0PS123456',
-        condition: 'used',
-        status: 'reserved',
-        color: 'Bianco Benny',
+        condition: 'new',
+        status: 'available',
+        color: 'Konigsegg Orange',
         transmission: 'manual',
         fuelType: 'gasoline',
-        engineSize: '6.0L V12',
-        horsepower: 800,
-        torque: 1050,
+        engineSize: '5.0L V8',
+        horsepower: 1385,
+        torque: 1020,
         images: [
-          'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800',
-          'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
+          'https://www.koenigsegg.com/wp-content/uploads/2023/08/CC850_01.jpg',
+          'https://www.koenigsegg.com/wp-content/uploads/2023/08/CC850_02.jpg',
         ],
-        features: ['AMG V12 Twin-Turbo', 'Carbo-Titanium Monocoque', 'Active Aero', 'Bespoke'],
-        description: 'Automotive art. Hand-crafted perfection with only 40 units worldwide. 7-Speed Sequential.',
+        features: ['Engage Shift System', 'Manual/Auto Hybrid Gearbox', 'Carbon Fiber Construction', 'Limited to 70 Units'],
+        description: 'Limited production hybrid hypercar with revolutionary Engage Shift System. 1,385 hp from twin-turbo V8. Only 70 units worldwide.',
         location: 'London, UK',
-        views: 12456,
+        views: 0,
         isFeatured: true,
       },
     ]);
     console.log(`✅ Created ${vehicles.length} luxury vehicles\n`);
 
-    // Seed Orders
-    console.log('📦 Seeding orders...');
-    const orders = await Order.bulkCreate([
-      {
-        id: '770e8400-e29b-41d4-a716-446655440001',
-        userId: users[1].id,
-        vehicleId: vehicles[2].id,
-        status: 'completed',
-        amount: 230000,
-        paymentMethod: 'wire_transfer',
-        paymentStatus: 'paid',
-        deliveryAddress: { street: '15 Kensington High St', city: 'London', postcode: 'W8 5NP', country: 'UK' },
-        notes: 'Please include full service history',
-      },
-      {
-        id: '770e8400-e29b-41d4-a716-446655440002',
-        userId: users[2].id,
-        vehicleId: vehicles[0].id,
-        status: 'processing',
-        amount: 325000,
-        paymentMethod: 'bank_transfer',
-        paymentStatus: 'paid',
-        deliveryAddress: { street: '42 Berkeley Square', city: 'London', postcode: 'W1J 5AJ', country: 'UK' },
-        notes: 'Urgent delivery requested',
-      },
-      {
-        id: '770e8400-e29b-41d4-a716-446655440003',
-        userId: users[1].id,
-        vehicleId: vehicles[5].id,
-        status: 'pending',
-        amount: 285000,
-        paymentMethod: 'financing',
-        paymentStatus: 'pending',
-        deliveryAddress: { street: '15 Kensington High St', city: 'London', postcode: 'W8 5NP', country: 'UK' },
-        notes: 'Awaiting finance approval',
-      },
-    ]);
-    console.log(`✅ Created ${orders.length} orders\n`);
-
-    // Seed Reviews
-    console.log('⭐ Seeding reviews...');
-    const reviews = await Review.bulkCreate([
-      {
-        userId: users[1].id,
-        vehicleId: vehicles[2].id,
-        rating: 5,
-        comment: 'Absolutely stunning vehicle. The performance is incredible and the service was impeccable.',
-        verified: true,
-      },
-      {
-        userId: users[2].id,
-        vehicleId: vehicles[0].id,
-        rating: 5,
-        comment: 'Dream car delivered! NordLion made the entire process seamless.',
-        verified: true,
-      },
-      {
-        userId: users[4].id,
-        vehicleId: vehicles[3].id,
-        rating: 5,
-        comment: 'The McLaren 750S is even better in person. Can\'t wait to get mine!',
-        verified: false,
-      },
-      {
-        userId: users[1].id,
-        vehicleId: vehicles[8].id,
-        rating: 5,
-        comment: 'The Chiron is the ultimate machine. Worth every penny.',
-        verified: false,
-      },
-    ]);
-    console.log(`✅ Created ${reviews.length} reviews\n`);
-
-    // Seed Messages
-    console.log('💬 Seeding messages...');
-    const messages = await Message.bulkCreate([
-      {
-        senderId: users[1].id,
-        receiverId: users[0].id,
-        content: 'Hi, I\'m interested in the Ferrari 296 GTB. Is it still available?',
-        type: 'inquiry',
-        read: true,
-        readAt: new Date(Date.now() - 3600000),
-      },
-      {
-        senderId: users[0].id,
-        receiverId: users[1].id,
-        content: 'Yes, the Ferrari is available! Would you like to schedule a viewing?',
-        type: 'text',
-        read: true,
-        readAt: new Date(Date.now() - 3000000),
-      },
-      {
-        senderId: users[1].id,
-        receiverId: users[0].id,
-        content: 'That would be great! I\'m available this weekend.',
-        type: 'text',
-        read: true,
-        readAt: new Date(Date.now() - 2400000),
-      },
-      {
-        senderId: users[2].id,
-        receiverId: users[0].id,
-        content: 'Hello! I wanted to inquire about the Bugatti Chiron. Can you provide more details?',
-        type: 'inquiry',
-        read: false,
-      },
-      {
-        senderId: users[0].id,
-        receiverId: users[2].id,
-        content: 'The Bugatti Chiron Super Sport is an exceptional vehicle with only 800 miles. Let me send you the full spec sheet.',
-        type: 'text',
-        read: true,
-        readAt: new Date(),
-      },
-      {
-        senderId: users[4].id,
-        receiverId: users[0].id,
-        content: 'Is the McLaren 750S negotiable on price?',
-        type: 'inquiry',
-        read: false,
-      },
-    ]);
-    console.log(`✅ Created ${messages.length} messages\n`);
-
     console.log('='.repeat(60));
     console.log('✨ Database seeded successfully!');
     console.log('='.repeat(60));
     console.log('\n📊 Summary:');
-    console.log(`   👥 Users:     ${users.length}`);
+    console.log(`   👥 Users:     ${users.length} (Admin only)`);
     console.log(`   🚗 Vehicles:  ${vehicles.length}`);
-    console.log(`   📦 Orders:    ${orders.length}`);
-    console.log(`   ⭐ Reviews:   ${reviews.length}`);
-    console.log(`   💬 Messages:  ${messages.length}`);
+    console.log(`   📦 Orders:    0 (will be created by real customers)`);
+    console.log(`   ⭐ Reviews:   0 (will be created by real customers)`);
+    console.log(`   💬 Messages:  0 (will be created by real customers)`);
     console.log('\n🔐 Login Credentials:');
     console.log('   ┌─────────────────────────────────────────────────────┐');
     console.log('   │ Admin:  admin@nordlion.com / Admin123!@#           │');
-    console.log('   │ User:   john.hamilton@example.com / User123!@#     │');
-    console.log('   │ Dealer: dealer@elitecars.com / Dealer123!@#        │');
     console.log('   └─────────────────────────────────────────────────────┘');
     console.log('\n🚀 Next Steps:');
     console.log('   1. cd backend && npm run dev     (Terminal 1)');

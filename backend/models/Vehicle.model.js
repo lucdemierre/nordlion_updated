@@ -9,8 +9,8 @@ const Vehicle = sequelize.define('Vehicle', {
   },
   vin: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
+    unique: true,
   },
   make: {
     type: DataTypes.STRING,
@@ -124,6 +124,17 @@ const Vehicle = sequelize.define('Vehicle', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+}, {
+  timestamps: true,
+  underscored: true,
+  indexes: [
+    { fields: ['make', 'model'] },
+    { fields: ['year'] },
+    { fields: ['price'] },
+    { fields: ['status'] },
+    { fields: ['condition'] },
+    { fields: ['is_featured'] },
+  ],
 });
 
 module.exports = Vehicle;

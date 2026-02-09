@@ -10,15 +10,26 @@ const Order = sequelize.define('Order', {
   userId: {
     type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
   },
   vehicleId: {
     type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'vehicles',
+      key: 'id',
+    },
   },
   orderNumber: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
+    unique: true,
+    defaultValue: () => {
+      return `NL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    },
   },
   status: {
     type: DataTypes.ENUM(
@@ -73,6 +84,16 @@ const Order = sequelize.define('Order', {
     type: DataTypes.ARRAY(DataTypes.STRING),
     defaultValue: [],
   },
+}, {
+  timestamps: true,
+  underscored: true,
+  indexes: [
+    { fields: ['user_id'] },
+    { fields: ['vehicle_id'] },
+    { fields: ['status'] },
+    { fields: ['payment_status'] },
+    { fields: ['created_at'] },
+  ],
 });
 
 module.exports = Order;

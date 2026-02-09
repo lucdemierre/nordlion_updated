@@ -11,7 +11,7 @@ const Message = sequelize.define('Message', {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'Users',
+      model: 'users', // Use lowercase to match actual table name
       key: 'id',
     },
   },
@@ -19,7 +19,7 @@ const Message = sequelize.define('Message', {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'Users',
+      model: 'users', // Use lowercase to match actual table name
       key: 'id',
     },
   },
@@ -44,11 +44,12 @@ const Message = sequelize.define('Message', {
   },
 }, {
   timestamps: true,
+  underscored: true, // Use snake_case for DB columns
   indexes: [
-    { fields: ['senderId'] },
-    { fields: ['receiverId'] },
+    { fields: ['sender_id'] },
+    { fields: ['receiver_id'] },
     { fields: ['read'] },
-    { fields: ['createdAt'] },
+    { fields: ['created_at'] },
   ],
 });
 

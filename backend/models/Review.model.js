@@ -10,10 +10,18 @@ const Review = sequelize.define('Review', {
   userId: {
     type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
   },
   vehicleId: {
     type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'vehicles',
+      key: 'id',
+    },
   },
   rating: {
     type: DataTypes.INTEGER,
@@ -56,6 +64,16 @@ const Review = sequelize.define('Review', {
   responseDate: {
     type: DataTypes.DATE,
   },
+}, {
+  timestamps: true,
+  underscored: true,
+  indexes: [
+    { fields: ['user_id'] },
+    { fields: ['vehicle_id'] },
+    { fields: ['rating'] },
+    { fields: ['verified'] },
+    { fields: ['created_at'] },
+  ],
 });
 
 module.exports = Review;

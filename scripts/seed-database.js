@@ -1,25 +1,13 @@
 require('dotenv').config();
-const { Sequelize } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const { sequelize } = require('../backend/config/database');
 
-// Database connection
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres',
-  logging: false,
-  dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production' ? {
-      require: true,
-      rejectUnauthorized: false
-    } : false
-  }
-});
-
-// Import models
-const User = require('../backend/models/User.model')(sequelize);
-const Vehicle = require('../backend/models/Vehicle.model')(sequelize);
-const Order = require('../backend/models/Order.model')(sequelize);
-const Review = require('../backend/models/Review.model')(sequelize);
-const Message = require('../backend/models/Message.model')(sequelize);
+// Import models directly (they already have sequelize instance)
+const User = require('../backend/models/User.model');
+const Vehicle = require('../backend/models/Vehicle.model');
+const Order = require('../backend/models/Order.model');
+const Review = require('../backend/models/Review.model');
+const Message = require('../backend/models/Message.model');
 
 // Define associations
 User.hasMany(Order, { foreignKey: 'userId' });
@@ -41,16 +29,20 @@ Message.belongsTo(User, { as: 'Receiver', foreignKey: 'receiverId' });
 
 const seedDatabase = async () => {
   try {
+    console.log('\n' + '='.repeat(60));
+    console.log('🌱 NordLion Database Seeder');
+    console.log('='.repeat(60) + '\n');
+
     console.log('🔄 Connecting to database...');
     await sequelize.authenticate();
-    console.log('✅ Database connected successfully!');
+    console.log('✅ Database connected successfully!\n');
 
-    console.log('🔄 Syncing database schema...');
+    console.log('🔄 Syncing database schema (this will reset all data)...');
     await sequelize.sync({ force: true });
-    console.log('✅ Database schema synced!');
+    console.log('✅ Database schema synced!\n');
 
-    // Seed Users
-    console.log('\n👥 Seeding users...');
+    // Seed Users (passwords already hashed in model hooks, but we hash here to bypass hooks)
+    console.log('👥 Seeding users...');
     const users = await User.bulkCreate([
       {
         id: '550e8400-e29b-41d4-a716-446655440001',
@@ -111,11 +103,11 @@ const seedDatabase = async () => {
         verified: true,
         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
       },
-    ]);
-    console.log(`✅ Created ${users.length} users`);
+    ], { individualHooks: false }); // Skip model hooks since we pre-hash
+    console.log(`✅ Created ${users.length} users\n`);
 
     // Seed Vehicles
-    console.log('\n🚗 Seeding luxury vehicles...');
+    console.log('🚗 Seeding luxury vehicles...');
     const vehicles = await Vehicle.bulkCreate([
       {
         id: '660e8400-e29b-41d4-a716-446655440001',
@@ -123,7 +115,7 @@ const seedDatabase = async () => {
         model: '296 GTB',
         year: 2024,
         price: 325000,
-        mileage: 0,
+        mileage: 250,
         vin: 'ZFF11KLA0P0294810',
         condition: 'new',
         status: 'available',
@@ -149,7 +141,7 @@ const seedDatabase = async () => {
         model: 'Revuelto',
         year: 2024,
         price: 608358,
-        mileage: 0,
+        mileage: 100,
         vin: 'ZHWGU5ZD0PLA13094',
         condition: 'new',
         status: 'available',
@@ -175,7 +167,7 @@ const seedDatabase = async () => {
         model: '911 Turbo S',
         year: 2023,
         price: 230000,
-        mileage: 3500,
+        mileage: 1500,
         vin: 'WP0AB2A99PS123456',
         condition: 'used',
         status: 'sold',
@@ -192,7 +184,7 @@ const seedDatabase = async () => {
         features: ['Sport Chrono', 'PASM', 'Rear Axle Steering', 'PDLS+'],
         description: 'The benchmark sports car. Unmatched versatility and performance.',
         location: 'Manchester, UK',
-        views: 892,
+        views: 3421,
         featured: false,
       },
       {
@@ -201,7 +193,7 @@ const seedDatabase = async () => {
         model: '750S',
         year: 2024,
         price: 324000,
-        mileage: 0,
+        mileage: 50,
         vin: 'SBM15DCA0PW003456',
         condition: 'new',
         status: 'available',
@@ -218,7 +210,7 @@ const seedDatabase = async () => {
         features: ['Carbon Fiber Tub', 'ProActive Chassis', 'Drift Mode', 'Track Telemetry'],
         description: 'Lighter. Faster. Sharper. The most powerful series-production McLaren supercar.',
         location: 'London, UK',
-        views: 1534,
+        views: 1876,
         featured: true,
       },
       {
@@ -227,9 +219,9 @@ const seedDatabase = async () => {
         model: 'DBS 770 Ultimate',
         year: 2023,
         price: 395000,
-        mileage: 1200,
+        mileage: 500,
         vin: 'SCFRMFBW5PGL12345',
-        condition: 'used',
+        condition: 'new',
         status: 'available',
         color: 'Xenon Grey',
         transmission: '8-Speed Auto',
@@ -244,7 +236,7 @@ const seedDatabase = async () => {
         features: ['Carbon Ceramic Brakes', 'Bang & Olufsen', 'Adaptive Damping', 'Carbon Fiber'],
         description: 'The ultimate expression of DBS Superleggera. Breathtaking V12 performance.',
         location: 'Birmingham, UK',
-        views: 678,
+        views: 1543,
         featured: false,
       },
       {
@@ -253,7 +245,7 @@ const seedDatabase = async () => {
         model: 'Continental GT Speed',
         year: 2023,
         price: 285000,
-        mileage: 2800,
+        mileage: 800,
         vin: 'SCBCA13W5PC123456',
         condition: 'used',
         status: 'pending',
@@ -270,7 +262,7 @@ const seedDatabase = async () => {
         features: ['W12 Engine', 'Mulliner Spec', 'Naim Audio', '4-Seat Config'],
         description: 'Grand touring perfection. Unrivaled luxury meets exhilarating performance.',
         location: 'London, UK',
-        views: 945,
+        views: 987,
         featured: false,
       },
       {
@@ -287,7 +279,7 @@ const seedDatabase = async () => {
         transmission: 'Single-Speed',
         fuelType: 'Electric',
         engineSize: 0,
-        horsepower: 584,
+        horsepower: 577,
         torque: 900,
         images: [
           'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800',
@@ -305,7 +297,7 @@ const seedDatabase = async () => {
         model: 'GT Black Series',
         year: 2022,
         price: 389000,
-        mileage: 1500,
+        mileage: 1200,
         vin: 'WDD1781771A123456',
         condition: 'used',
         status: 'available',
@@ -322,7 +314,7 @@ const seedDatabase = async () => {
         features: ['Flat-Plane Crank', 'Adjustable Coilovers', 'Aero Package', 'Track Modes'],
         description: 'The most powerful AMG ever. Track-focused road-legal supercar.',
         location: 'Edinburgh, UK',
-        views: 1123,
+        views: 1654,
         featured: false,
       },
       {
@@ -378,10 +370,10 @@ const seedDatabase = async () => {
         featured: true,
       },
     ]);
-    console.log(`✅ Created ${vehicles.length} luxury vehicles`);
+    console.log(`✅ Created ${vehicles.length} luxury vehicles\n`);
 
     // Seed Orders
-    console.log('\n📦 Seeding orders...');
+    console.log('📦 Seeding orders...');
     const orders = await Order.bulkCreate([
       {
         id: '770e8400-e29b-41d4-a716-446655440001',
@@ -417,10 +409,10 @@ const seedDatabase = async () => {
         notes: 'Awaiting finance approval',
       },
     ]);
-    console.log(`✅ Created ${orders.length} orders`);
+    console.log(`✅ Created ${orders.length} orders\n`);
 
     // Seed Reviews
-    console.log('\n⭐ Seeding reviews...');
+    console.log('⭐ Seeding reviews...');
     const reviews = await Review.bulkCreate([
       {
         userId: users[1].id,
@@ -451,10 +443,10 @@ const seedDatabase = async () => {
         verified: false,
       },
     ]);
-    console.log(`✅ Created ${reviews.length} reviews`);
+    console.log(`✅ Created ${reviews.length} reviews\n`);
 
     // Seed Messages
-    console.log('\n💬 Seeding messages...');
+    console.log('💬 Seeding messages...');
     const messages = await Message.bulkCreate([
       {
         senderId: users[1].id,
@@ -503,24 +495,32 @@ const seedDatabase = async () => {
         read: false,
       },
     ]);
-    console.log(`✅ Created ${messages.length} messages`);
+    console.log(`✅ Created ${messages.length} messages\n`);
 
-    console.log('\n✨ Database seeded successfully!');
+    console.log('='.repeat(60));
+    console.log('✨ Database seeded successfully!');
+    console.log('='.repeat(60));
     console.log('\n📊 Summary:');
-    console.log(`   👥 Users: ${users.length}`);
-    console.log(`   🚗 Vehicles: ${vehicles.length}`);
-    console.log(`   📦 Orders: ${orders.length}`);
-    console.log(`   ⭐ Reviews: ${reviews.length}`);
-    console.log(`   💬 Messages: ${messages.length}`);
+    console.log(`   👥 Users:     ${users.length}`);
+    console.log(`   🚗 Vehicles:  ${vehicles.length}`);
+    console.log(`   📦 Orders:    ${orders.length}`);
+    console.log(`   ⭐ Reviews:   ${reviews.length}`);
+    console.log(`   💬 Messages:  ${messages.length}`);
     console.log('\n🔐 Login Credentials:');
-    console.log('   Admin:  admin@nordlion.com / Admin123!@#');
-    console.log('   User:   john.hamilton@example.com / User123!@#');
-    console.log('   Dealer: dealer@elitecars.com / Dealer123!@#');
-    console.log('\n🚀 Ready to start! Run: npm run dev\n');
+    console.log('   ┌─────────────────────────────────────────────────────┐');
+    console.log('   │ Admin:  admin@nordlion.com / Admin123!@#           │');
+    console.log('   │ User:   john.hamilton@example.com / User123!@#     │');
+    console.log('   │ Dealer: dealer@elitecars.com / Dealer123!@#        │');
+    console.log('   └─────────────────────────────────────────────────────┘');
+    console.log('\n🚀 Next Steps:');
+    console.log('   1. cd backend && npm run dev     (Terminal 1)');
+    console.log('   2. npm run dev                   (Terminal 2)');
+    console.log('   3. Open: http://localhost:3000\n');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    console.error('\n❌ Error seeding database:');
+    console.error(error);
     process.exit(1);
   }
 };

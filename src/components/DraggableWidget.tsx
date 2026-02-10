@@ -211,7 +211,7 @@ export default function DraggableWidget({
     <div
       ref={widgetRef}
       data-widget-id={id}
-      className={`widget-container bg-[#141414] border border-white/5 rounded-xl overflow-hidden transition-all ${\
+      className={`widget-container bg-[#141414] border border-white/5 rounded-xl overflow-hidden transition-all ${
         isDragging 
           ? 'duration-75 shadow-2xl shadow-[#D67C3C]/40 scale-[0.97] border-[#D67C3C]/50' 
           : 'duration-300 ease-out'

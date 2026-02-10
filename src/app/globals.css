@@ -2,50 +2,184 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   LUXURY DESIGN SYSTEM - NORDLION
+   Inspired by Elita with enhanced refinement
+   ============================================ */
+
 :root {
-  --primary: #D67C3C;
-  --primary-dark: #B85A1F;
-  --primary-light: #f37738;
+  /* Color System - Light Mode */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 5%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 5%;
+  
+  /* Luxury Gold Primary */
+  --primary: 43 74% 49%;
+  --primary-foreground: 0 0% 5%;
+  --primary-glow: 43 74% 49%;
+  
+  /* Elegant Secondary */
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  
+  --accent: 43 74% 49%;
+  --accent-foreground: 0 0% 5%;
+  
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 43 74% 49%;
+  
+  --radius: 0.5rem;
+  
+  /* Luxury Gold Palette */
+  --gold: #D4AF37;
+  --gold-light: #E8C95A;
+  --gold-dark: #B8962C;
+  --gold-glow: rgba(212, 175, 55, 0.25);
+}
+
+.dark {
+  /* Dark Mode - Enhanced Luxury */
+  --background: 0 0% 3%;
+  --foreground: 0 0% 98%;
+  
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 98%;
+  
+  --primary: 43 74% 55%;
+  --primary-foreground: 0 0% 5%;
+  --primary-glow: 43 74% 55%;
+  
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 98%;
+  
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 55%;
+  
+  --accent: 43 74% 55%;
+  --accent-foreground: 0 0% 5%;
+  
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 43 74% 55%;
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
-    @apply bg-[#0f0f0f] text-white antialiased;
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: "kern" 1;
+    letter-spacing: -0.011em;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+  
+  h1 {
+    @apply text-5xl md:text-7xl lg:text-8xl font-bold;
+  }
+  
+  h2 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+  
+  h3 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
   }
 }
 
 @layer utilities {
   .glass-effect {
-    @apply bg-white/5 backdrop-blur-xl;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-[#D67C3C] to-[#B85A1F] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#D4AF37] via-[#E8C95A] to-[#D4AF37] bg-clip-text text-transparent;
   }
   
   .container-custom {
-    @apply max-w-7xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-6 lg:px-8;
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-xl font-medium transition-colors;
+    @apply px-8 py-4 bg-[#D4AF37] hover:bg-[#B8962C] text-black rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_40px_rgba(212,175,55,0.3)] hover:scale-105;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10;
+    @apply px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-xl font-semibold transition-all duration-300 border border-white/10;
   }
 }
 
-/* Custom scrollbar */
+.gold-glow {
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+  transition: box-shadow 0.5s ease;
+}
+
+.gold-glow:hover {
+  box-shadow: 0 0 60px rgba(212, 175, 55, 0.25);
+}
+
+.luxury-hover {
+  @apply transition-all duration-500 ease-out;
+}
+
+.luxury-hover:hover {
+  @apply scale-[1.02];
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+::selection {
+  background-color: rgba(212, 175, 55, 0.3);
+  color: #ffffff;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-[#0a0a0a];
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-lg hover:bg-white/20;
+  background: #D4AF37;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E8C95A;
 }

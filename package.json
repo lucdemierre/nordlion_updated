@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node scripts/seed-database.js",
+    "seed:clean": "node scripts/seed-database-v2.js",
     "check-db": "node scripts/check-database.js"
   },
   "dependencies": {

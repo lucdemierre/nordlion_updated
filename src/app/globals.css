@@ -4,39 +4,18 @@
 
 @layer base {
   :root {
-    /* ELITA Color System */
-    --background: 0 0% 0%; /* #000000 */
-    --background-elevated: 0 0% 4%; /* #0a0a0a */
-    --foreground: 0 0% 100%; /* #ffffff */
-    --foreground-muted: 0 0% 90%; /* #e5e5e5 */
-    --foreground-subtle: 0 0% 64%; /* #a3a3a3 */
-    
-    --primary: 351 100% 65%; /* #ff4d6d - Red/Pink accent */
-    --primary-hover: 351 100% 70%;
-    --primary-active: 351 100% 60%;
-    
-    --border: 0 0% 15%; /* #262626 */
-    --border-subtle: 0 0% 10%; /* #1a1a1a */
-    
-    --card: 0 0% 4%;
-    --card-elevated: 0 0% 6%;
-    
-    --input-bg: 0 0% 8%;
-    --input-border: 0 0% 20%;
-    
-    --success: 142 71% 45%;
-    --warning: 38 92% 50%;
-    --error: 0 84% 60%;
-    
-    --radius: 0.375rem;
-    --radius-sm: 0.25rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-    
-    /* Transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --primary: 16 100% 60%; /* Orange #ff6b35 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+    --border: 0 0% 20%;
+    --radius: 0rem;
   }
 }
 
@@ -44,256 +23,184 @@
   * {
     @apply border-border;
   }
-  
-  html {
-    @apply scroll-smooth;
-  }
-  
   body {
     @apply bg-black text-white antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    font-feature-settings: 'cv11', 'ss01';
-    font-variation-settings: 'opsz' auto;
-  }
-  
-  /* Typography */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-light tracking-tight;
-  }
-  
-  h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl;
-    letter-spacing: -0.02em;
-  }
-  
-  h2 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
-    letter-spacing: -0.02em;
-  }
-  
-  h3 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
-    letter-spacing: -0.01em;
-  }
-  
-  h4 {
-    @apply text-2xl md:text-3xl;
-    letter-spacing: -0.01em;
-  }
-  
-  h5 {
-    @apply text-xl md:text-2xl;
-  }
-  
-  h6 {
-    @apply text-lg md:text-xl;
-  }
-  
-  p {
-    @apply text-base text-neutral-400 leading-relaxed;
-  }
-  
-  a {
-    @apply transition-colors duration-200;
-  }
-  
-  /* Selection */
-  ::selection {
-    @apply bg-primary/20 text-white;
-  }
-  
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    @apply w-2 h-2;
-  }
-  
-  ::-webkit-scrollbar-track {
-    @apply bg-neutral-950;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-800 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-700;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
 }
 
 @layer components {
   /* Container */
   .container-elita {
-    @apply max-w-[1920px] mx-auto px-6 md:px-12 lg:px-24;
+    @apply w-full mx-auto px-6 md:px-12 lg:px-24 max-w-[1920px];
   }
-  
-  .container-narrow {
-    @apply max-w-7xl mx-auto px-6 md:px-12;
-  }
-  
+
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-medium rounded-sm;
-    @apply hover:bg-primary-hover active:bg-primary-active transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black;
+    @apply inline-flex items-center justify-center px-8 py-4 bg-[#ff6b35] hover:bg-[#ff6b35]/90 text-white font-light tracking-wide border border-transparent transition-all duration-200;
   }
-  
+
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white font-medium rounded-sm;
-    @apply border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black;
+    @apply inline-flex items-center justify-center px-8 py-4 bg-transparent hover:bg-white/5 text-white font-light tracking-wide border border-white/20 transition-all duration-200;
   }
-  
+
   .btn-text {
-    @apply inline-flex items-center gap-2 text-white font-medium;
-    @apply hover:text-neutral-300 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2 bg-transparent hover:bg-white/5 text-white font-light tracking-wide border border-transparent transition-all duration-200;
   }
-  
+
+  /* Typography */
+  .heading-1 {
+    @apply text-5xl md:text-6xl lg:text-7xl font-extralight tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-extralight tracking-tight;
+  }
+
+  .heading-3 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-light tracking-tight;
+  }
+
+  .heading-4 {
+    @apply text-2xl md:text-3xl font-light tracking-tight;
+  }
+
+  .heading-5 {
+    @apply text-xl md:text-2xl font-light;
+  }
+
+  .body-lg {
+    @apply text-lg md:text-xl font-light text-neutral-300 leading-relaxed;
+  }
+
+  .body-md {
+    @apply text-base md:text-lg font-light text-neutral-300 leading-relaxed;
+  }
+
+  .body-sm {
+    @apply text-sm md:text-base font-light text-neutral-400 leading-relaxed;
+  }
+
+  /* Forms */
+  .input-elita {
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff6b35] transition-colors;
+  }
+
+  .textarea-elita {
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff6b35] transition-colors resize-none;
+  }
+
+  .label-elita {
+    @apply block text-sm font-light text-neutral-400 mb-2 tracking-wide uppercase;
+  }
+
   /* Cards */
   .card-elita {
-    @apply bg-neutral-950/50 backdrop-blur-sm border border-white/5 rounded-sm overflow-hidden;
-    @apply transition-all duration-300;
+    @apply bg-white/5 border border-white/10 backdrop-blur-sm;
   }
-  
-  .card-elita:hover {
-    @apply border-white/10 bg-neutral-950/70;
+
+  .card-hover {
+    @apply transition-all duration-300 hover:bg-white/10 hover:border-[#ff6b35]/50;
   }
-  
-  /* Inputs */
-  .input-elita {
-    @apply w-full px-4 py-3 bg-neutral-950 border border-white/10 rounded-sm;
-    @apply text-white placeholder:text-neutral-600;
-    @apply focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20;
-    @apply transition-all duration-200;
+
+  /* Sections */
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
   }
-  
-  .textarea-elita {
-    @apply input-elita min-h-[120px] resize-none;
-  }
-  
+
   /* Animations */
   .fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: fadeIn 0.6s ease-in;
   }
-  
+
   .slide-up {
-    animation: slideUp 0.8s ease-out forwards;
+    animation: slideUp 0.6s ease-out;
   }
-  
-  .scale-in {
-    animation: scaleIn 0.5s ease-out forwards;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
-  
-  /* Hero sections */
-  .hero-section {
-    @apply relative min-h-screen flex items-center justify-center overflow-hidden;
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  
-  .hero-content {
-    @apply relative z-10 text-center max-w-4xl mx-auto px-6;
+
+  /* Scrollbar */
+  .scrollbar-elita::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-  
-  .hero-overlay {
-    @apply absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-0;
+
+  .scrollbar-elita::-webkit-scrollbar-track {
+    @apply bg-white/5;
   }
-  
-  /* Navigation dots */
-  .nav-dots {
-    @apply flex gap-2 justify-center;
+
+  .scrollbar-elita::-webkit-scrollbar-thumb {
+    @apply bg-white/20 hover:bg-white/30;
   }
-  
-  .nav-dot {
-    @apply w-2 h-2 rounded-full bg-white/20 transition-all duration-300;
-    @apply hover:bg-white/40 cursor-pointer;
-  }
-  
-  .nav-dot.active {
-    @apply w-8 bg-white;
-  }
-  
-  /* Horizontal scroll container */
-  .scroll-container {
-    @apply flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory;
-    scroll-behavior: smooth;
+
+  /* Horizontal Scroll */
+  .horizontal-scroll {
+    @apply flex overflow-x-auto snap-x snap-mandatory scrollbar-elita;
     -webkit-overflow-scrolling: touch;
   }
-  
-  .scroll-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .scroll-item {
-    @apply snap-start flex-shrink-0;
+
+  .horizontal-scroll > * {
+    @apply snap-start;
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent;
+  .text-balance {
+    text-wrap: balance;
   }
-  
-  .border-gradient {
-    border-image: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) 1;
+
+  .text-primary {
+    @apply text-[#ff6b35];
   }
-  
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+
+  .bg-primary {
+    @apply bg-[#ff6b35];
   }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+
+  .border-primary {
+    @apply border-[#ff6b35];
+  }
+
+  .hover-primary {
+    @apply hover:text-[#ff6b35];
   }
 }
 
-/* Keyframe Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Loading states */
-.loading-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
+/* Loading States */
 @keyframes shimmer {
   0% {
-    background-position: -200% 0;
+    background-position: -1000px 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: 1000px 0;
   }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
 }

@@ -20,7 +20,7 @@ export default function LoginPage() {
 
     // Mock login - replace with actual API call
     setTimeout(() => {
-      router.push('/account')
+      router.push('/dashboard')
     }, 1000)
   }
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
         <div className="text-center text-sm">
           <span className="text-neutral-500 font-light">Don't have an account? </span>
           <Link
-            href="/auth/signup"
+            href="/auth/register"
             className="text-[#ff6b35] hover:text-[#ff6b35]/80 font-light transition-colors"
           >
             Create Private Desk

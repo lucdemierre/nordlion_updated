@@ -2,162 +2,249 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/shared/Navigation'
-import Footer from '@/components/shared/Footer'
-import { ChevronDown, Grid3x3, List, SlidersHorizontal } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
+import Navigation from '@/components/layout/Navigation'
+import Footer from '@/components/layout/Footer'
+import { ProductCard } from '@/components/ui/ProductCard'
+import { Button } from '@/components/ui/Button'
 
 export default function WatchesPage() {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [filterOpen, setFilterOpen] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [selectedBrand, setSelectedBrand] = useState('all')
+  const [selectedCondition, setSelectedCondition] = useState('all')
+  const [sortBy, setSortBy] = useState('featured')
 
-  // Sample data - would come from API/database
+  // Mock data - will be replaced with API call
   const watches = [
     {
-      id: 1,
-      brand: 'PATEK PHILIPPE',
-      model: 'Nautilus 5711/1A-018',
-      year: 2024,
-      price: 'Price on Request',
-      reference: '5711/1A-018',
+      id: '1',
+      category: 'watches',
+      brand: 'Patek Philippe',
+      model: 'Nautilus 5711/1A',
+      year: 2021,
+      price: 185000,
+      image: '/api/placeholder/800/600',
       condition: 'Unworn',
-      image: '/placeholder-watch.jpg',
-      status: 'available'
+      featured: true,
     },
-    // Add more watches...
+    {
+      id: '2',
+      category: 'watches',
+      brand: 'Rolex',
+      model: 'Daytona 116500LN',
+      year: 2023,
+      price: 45000,
+      image: '/api/placeholder/800/600',
+      condition: 'Excellent',
+      featured: true,
+    },
+    {
+      id: '3',
+      category: 'watches',
+      brand: 'Audemars Piguet',
+      model: 'Royal Oak 15500ST',
+      year: 2022,
+      price: 72000,
+      image: '/api/placeholder/800/600',
+      condition: 'Like New',
+    },
+    {
+      id: '4',
+      category: 'watches',
+      brand: 'Richard Mille',
+      model: 'RM 11-03',
+      year: 2023,
+      price: 295000,
+      image: '/api/placeholder/800/600',
+      condition: 'Unworn',
+      featured: true,
+    },
   ]
 
+  const brands = ['Patek Philippe', 'Rolex', 'Audemars Piguet', 'Richard Mille', 'Vacheron Constantin', 'A. Lange & Söhne']
+  const conditions = ['Unworn', 'Like New', 'Excellent', 'Very Good', 'Good']
+
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] text-white">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20">
-        <div className="section-container">
-          <div className="max-w-3xl">
-            <h4 className="text-label mb-4">COLLECTION</h4>
-            <h1 className="text-headline mb-6">WATCHES</h1>
-            <p className="text-body-large">
-              Rare timepieces from independent manufactures and established maisons—authenticated through specialist networks, documented provenance, and available for immediate delivery or vault custody.
+      {/* Hero */}
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black" />
+        <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] bg-cover bg-center" />
+        
+        <div className="relative z-10 container-elita text-center">
+          <div className="fade-in">
+            <Link href="/" className="inline-block text-xs text-neutral-500 hover:text-[#ff6b35] mb-4 transition-colors">
+              Home
+            </Link>
+            <h1 className="heading-1 mb-4">WATCHES</h1>
+            <p className="body-lg max-w-2xl mx-auto">
+              Exceptional timepieces from the world's finest manufactures
             </p>
           </div>
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <section className="border-t border-[var(--color-border-primary)] sticky top-16 z-40 bg-[var(--color-bg-primary)]/95 backdrop-blur-xl">
-        <div className="section-container py-4">
-          <div className="flex items-center justify-between">
-            {/* Filter Toggles */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setFilterOpen(!filterOpen)}
-                className="btn-secondary text-sm"
-              >
-                <SlidersHorizontal size={16} />
-                FILTERS
-              </button>
-              
-              <div className="hidden md:flex items-center gap-2 text-sm">
-                <button className="px-4 py-2 bg-[var(--color-bg-elevated)] rounded-lg hover:border-[var(--color-border-accent)] border border-[var(--color-border-primary)]">
-                  Brand <ChevronDown size={14} className="inline ml-1" />
-                </button>
-                <button className="px-4 py-2 bg-[var(--color-bg-elevated)] rounded-lg hover:border-[var(--color-border-accent)] border border-[var(--color-border-primary)]">
-                  Year <ChevronDown size={14} className="inline ml-1" />
-                </button>
-                <button className="px-4 py-2 bg-[var(--color-bg-elevated)] rounded-lg hover:border-[var(--color-border-accent)] border border-[var(--color-border-primary)]">
-                  Price <ChevronDown size={14} className="inline ml-1" />
-                </button>
-                <button className="px-4 py-2 bg-[var(--color-bg-elevated)] rounded-lg hover:border-[var(--color-border-accent)] border border-[var(--color-border-primary)]">
-                  Condition <ChevronDown size={14} className="inline ml-1" />
-                </button>
+      {/* Filters & Grid */}
+      <section className="container-elita section-padding">
+        {/* Filter Bar */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+            >
+              <SlidersHorizontal size={16} />
+              <span className="text-sm font-light">Filters</span>
+            </button>
+            
+            {(selectedBrand !== 'all' || selectedCondition !== 'all') && (
+              <div className="flex items-center gap-2">
+                {selectedBrand !== 'all' && (
+                  <span className="px-3 py-1 bg-[#ff6b35]/20 text-[#ff6b35] text-xs flex items-center gap-2">
+                    {selectedBrand}
+                    <button onClick={() => setSelectedBrand('all')}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {selectedCondition !== 'all' && (
+                  <span className="px-3 py-1 bg-[#ff6b35]/20 text-[#ff6b35] text-xs flex items-center gap-2">
+                    {selectedCondition}
+                    <button onClick={() => setSelectedCondition('all')}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-neutral-500 font-light">{watches.length} pieces</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 bg-white/5 border border-white/10 text-sm font-light focus:outline-none focus:border-[#ff6b35]"
+            >
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="newest">Newest First</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex gap-8">
+          {/* Sidebar Filters */}
+          {showFilters && (
+            <div className="w-64 flex-shrink-0">
+              <div className="space-y-8 sticky top-24">
+                {/* Brand Filter */}
+                <div>
+                  <h3 className="text-sm font-light tracking-wider uppercase mb-4 text-neutral-400">Brand</h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="brand"
+                        value="all"
+                        checked={selectedBrand === 'all'}
+                        onChange={(e) => setSelectedBrand(e.target.value)}
+                        className="w-4 h-4 accent-[#ff6b35]"
+                      />
+                      <span className="text-sm font-light group-hover:text-[#ff6b35] transition-colors">
+                        All Brands
+                      </span>
+                    </label>
+                    {brands.map((brand) => (
+                      <label key={brand} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="brand"
+                          value={brand}
+                          checked={selectedBrand === brand}
+                          onChange={(e) => setSelectedBrand(e.target.value)}
+                          className="w-4 h-4 accent-[#ff6b35]"
+                        />
+                        <span className="text-sm font-light group-hover:text-[#ff6b35] transition-colors">
+                          {brand}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Condition Filter */}
+                <div>
+                  <h3 className="text-sm font-light tracking-wider uppercase mb-4 text-neutral-400">Condition</h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="condition"
+                        value="all"
+                        checked={selectedCondition === 'all'}
+                        onChange={(e) => setSelectedCondition(e.target.value)}
+                        className="w-4 h-4 accent-[#ff6b35]"
+                      />
+                      <span className="text-sm font-light group-hover:text-[#ff6b35] transition-colors">
+                        All Conditions
+                      </span>
+                    </label>
+                    {conditions.map((condition) => (
+                      <label key={condition} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="condition"
+                          value={condition}
+                          checked={selectedCondition === condition}
+                          onChange={(e) => setSelectedCondition(e.target.value)}
+                          className="w-4 h-4 accent-[#ff6b35]"
+                        />
+                        <span className="text-sm font-light group-hover:text-[#ff6b35] transition-colors">
+                          {condition}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* View Mode & Sort */}
-            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-1 bg-[var(--color-bg-elevated)] rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded transition-colors ${
-                    viewMode === 'grid' ? 'bg-[var(--color-accent-primary)] text-black' : 'text-[var(--color-text-secondary)]'
-                  }`}
-                >
-                  <Grid3x3 size={16} />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded transition-colors ${
-                    viewMode === 'list' ? 'bg-[var(--color-accent-primary)] text-black' : 'text-[var(--color-text-secondary)]'
-                  }`}
-                >
-                  <List size={16} />
-                </button>
-              </div>
-              
-              <select className="input-field py-2 text-sm">
-                <option>Newest First</option>
-                <option>Price: High to Low</option>
-                <option>Price: Low to High</option>
-                <option>Brand A-Z</option>
-              </select>
+          {/* Product Grid */}
+          <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {watches.map((watch) => (
+                <ProductCard key={watch.id} {...watch} />
+              ))}
+            </div>
+
+            {/* Load More */}
+            <div className="mt-12 text-center">
+              <Button variant="secondary">
+                Load More
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Products Grid */}
-      <section className="section-container py-12">
-        <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'}>
-          {watches.map((watch) => (
-            <Link
-              key={watch.id}
-              href={`/watches/${watch.id}`}
-              className="group card-elevated p-6 hover:border-[var(--color-border-accent)] transition-all"
-            >
-              <div className="aspect-square bg-[var(--color-bg-secondary)] rounded-lg mb-4 flex items-center justify-center">
-                {/* Placeholder for watch image */}
-                <span className="text-[var(--color-text-tertiary)] text-sm">IMAGE</span>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="badge badge-available text-xs">AVAILABLE</span>
-                  <span className="text-xs text-[var(--color-text-tertiary)]">{watch.year}</span>
-                </div>
-                
-                <h3 className="text-lg font-medium group-hover:text-[var(--color-accent-primary)] transition-colors">
-                  {watch.brand}
-                </h3>
-                <p className="text-sm text-[var(--color-text-secondary)]">{watch.model}</p>
-                
-                <div className="pt-4 border-t border-[var(--color-border-primary)] mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-[var(--color-text-tertiary)]">{watch.reference}</span>
-                    <span className="text-sm font-medium">{watch.price}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-center gap-2 mt-12">
-          <button className="px-4 py-2 text-sm border border-[var(--color-border-primary)] rounded-lg hover:border-[var(--color-border-accent)] transition-colors">
-            Previous
-          </button>
-          <button className="px-4 py-2 text-sm bg-[var(--color-accent-primary)] text-black rounded-lg">
-            1
-          </button>
-          <button className="px-4 py-2 text-sm border border-[var(--color-border-primary)] rounded-lg hover:border-[var(--color-border-accent)] transition-colors">
-            2
-          </button>
-          <button className="px-4 py-2 text-sm border border-[var(--color-border-primary)] rounded-lg hover:border-[var(--color-border-accent)] transition-colors">
-            3
-          </button>
-          <button className="px-4 py-2 text-sm border border-[var(--color-border-primary)] rounded-lg hover:border-[var(--color-border-accent)] transition-colors">
-            Next
-          </button>
+      {/* CTA Section */}
+      <section className="container-elita section-padding border-t border-white/10">
+        <div className="text-center max-w-2xl mx-auto space-y-6">
+          <h2 className="heading-3">CAN'T FIND WHAT YOU'RE LOOKING FOR?</h2>
+          <p className="body-md">
+            Our acquisition team can source specific pieces through our global network of boutiques, auction houses, and private collectors.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button href="/client-care/submit-asset">Submit Inquiry</Button>
+            <Button href="/client-care/schedule-appointment" variant="secondary">
+              Schedule Appointment
+            </Button>
+          </div>
         </div>
       </section>
 

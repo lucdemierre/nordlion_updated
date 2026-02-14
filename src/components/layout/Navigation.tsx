@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { colors, transitions } from '@/styles/design-tokens';
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Menu, X, MapPin, Phone, Search } from 'lucide-react'
 
-const menuItems = [
+const navigationSections = [
   {
     title: 'Collection',
-    items: [
+    links: [
       { label: 'Watches', href: '/watches' },
       { label: 'Cars', href: '/cars' },
-      { label: 'Private Jets', href: '/jets' },
+      { label: 'Jets', href: '/jets' },
       { label: 'Yachts', href: '/yachts' },
       { label: 'Estates', href: '/estates' },
     ],
   },
   {
     title: 'Services',
-    items: [
+    links: [
       { label: 'Acquisition', href: '/services/acquisition' },
       { label: 'Resale & Consignment', href: '/services/resale-consignment' },
       { label: 'Authentication & Provenance', href: '/services/authentication-provenance' },
@@ -30,7 +30,7 @@ const menuItems = [
   },
   {
     title: 'About',
-    items: [
+    links: [
       { label: 'Vision', href: '/about/vision' },
       { label: 'Services', href: '/about/services' },
       { label: 'Reserve Singapore', href: '/about/reserve-singapore' },
@@ -42,7 +42,7 @@ const menuItems = [
   },
   {
     title: 'Client Care',
-    items: [
+    links: [
       { label: 'Submit Asset', href: '/client-care/submit-asset' },
       { label: 'Schedule Appointment', href: '/client-care/schedule-appointment' },
       { label: 'Aftercare', href: '/client-care/aftercare' },
@@ -52,233 +52,180 @@ const menuItems = [
   },
   {
     title: 'More',
-    items: [
+    links: [
       { label: 'Locations', href: '/locations' },
       { label: 'Journal', href: '/journal' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Private Desk', href: '/account' },
+      { label: 'Investors', href: '/investors/overview' },
     ],
   },
-];
+]
 
-export const Navigation: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    // Close menu on route change
+    setIsMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    // Prevent body scroll when menu is open
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isMenuOpen])
 
   return (
     <>
       <nav
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: `1px solid ${colors.border}`,
-          zIndex: 1000,
-        }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? 'bg-black/95 backdrop-blur-md border-b border-white/10' : 'bg-transparent'
+        }`}
       >
-        <div
-          style={{
-            maxWidth: '1920px',
-            margin: '0 auto',
-            padding: '1rem 2rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Hamburger Menu */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: colors.white,
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              transition: transitions.base,
-            }}
-            aria-label="Toggle menu"
-          >
-            <span
-              style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: colors.white,
-                transition: transitions.base,
-                transform: isMenuOpen ? 'rotate(45deg) translateY(6px)' : 'none',
-              }}
-            />
-            <span
-              style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: colors.white,
-                transition: transitions.base,
-                opacity: isMenuOpen ? 0 : 1,
-              }}
-            />
-            <span
-              style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: colors.white,
-                transition: transitions.base,
-                transform: isMenuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none',
-              }}
-            />
-          </button>
-
-          {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-            <span
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: colors.white,
-                letterSpacing: '0.1em',
-              }}
-            >
-              NORDLION
-            </span>
-          </Link>
-
-          {/* Right Icons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Link
-              href="/locations"
-              style={{
-                color: colors.gray,
-                transition: transitions.base,
-                fontSize: '1.25rem',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = colors.white;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = colors.gray;
-              }}
-              aria-label="Locations"
-            >
-              📍
-            </Link>
-            <Link
-              href="/contact"
-              style={{
-                color: colors.gray,
-                transition: transitions.base,
-                fontSize: '1.25rem',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = colors.white;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = colors.gray;
-              }}
-              aria-label="Contact"
-            >
-              ✉️
-            </Link>
+        <div className="container-elita">
+          <div className="flex items-center justify-between h-20">
+            {/* Left: Menu Toggle */}
             <button
-              style={{
-                background: 'none',
-                border: 'none',
-                color: colors.gray,
-                fontSize: '1.25rem',
-                cursor: 'pointer',
-                transition: transitions.base,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = colors.white;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = colors.gray;
-              }}
-              aria-label="Search"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center gap-2 text-white hover:text-neutral-300 transition-colors"
+              aria-label="Toggle menu"
             >
-              🔍
+              <Menu className="w-6 h-6" />
+              <span className="text-sm font-medium tracking-wider hidden md:inline">MENU</span>
             </button>
+
+            {/* Center: Logo */}
+            <Link href="/" className="absolute left-1/2 -translate-x-1/2">
+              <div className="text-2xl font-light tracking-widest text-white hover:text-neutral-300 transition-colors">
+                NORDLION
+              </div>
+            </Link>
+
+            {/* Right: Icons */}
+            <div className="flex items-center gap-4">
+              <Link
+                href="/locations"
+                className="text-white hover:text-neutral-300 transition-colors"
+                aria-label="Locations"
+              >
+                <MapPin className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/contact"
+                className="text-white hover:text-neutral-300 transition-colors"
+                aria-label="Contact"
+              >
+                <Phone className="w-5 h-5" />
+              </Link>
+              <button
+                className="text-white hover:text-neutral-300 transition-colors"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Full-Screen Overlay Menu */}
-      {isMenuOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: colors.black,
-            zIndex: 999,
-            overflow: 'auto',
-            paddingTop: '5rem',
-          }}
-        >
-          <div
-            style={{
-              maxWidth: '1400px',
-              margin: '0 auto',
-              padding: '2rem',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-              gap: '3rem',
-            }}
-          >
-            {menuItems.map((section) => (
-              <div key={section.title}>
-                <h3
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    color: colors.gray,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    marginBottom: '1.5rem',
-                  }}
+      {/* Full-Screen Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-50 bg-black transition-opacity duration-500 ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="container-elita h-full flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between h-20 border-b border-white/10">
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-2 text-white hover:text-neutral-300 transition-colors"
+            >
+              <X className="w-6 h-6" />
+              <span className="text-sm font-medium tracking-wider hidden md:inline">CLOSE</span>
+            </button>
+
+            <Link href="/" className="text-2xl font-light tracking-widest text-white">
+              NORDLION
+            </Link>
+
+            <div className="w-24" /> {/* Spacer for centering */}
+          </div>
+
+          {/* Menu Content */}
+          <div className="flex-1 overflow-y-auto py-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
+              {navigationSections.map((section, idx) => (
+                <div
+                  key={section.title}
+                  className="space-y-6"
+                  style={{ animationDelay: `${idx * 50}ms` }}
                 >
-                  {section.title}
-                </h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {section.items.map((item) => (
-                    <li key={item.href} style={{ marginBottom: '1rem' }}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsMenuOpen(false)}
-                        style={{
-                          fontSize: '1.5rem',
-                          fontWeight: '500',
-                          color: colors.lightGray,
-                          textDecoration: 'none',
-                          transition: transitions.base,
-                          display: 'block',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = colors.white;
-                          e.currentTarget.style.paddingLeft = '1rem';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = colors.lightGray;
-                          e.currentTarget.style.paddingLeft = '0';
-                        }}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                  <h3 className="text-sm font-medium tracking-widest text-neutral-500 uppercase">
+                    {section.title}
+                  </h3>
+                  <ul className="space-y-4">
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="text-xl md:text-2xl font-light text-white hover:text-primary transition-colors duration-200"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6">
+              <Link href="/account" className="btn-primary flex-1 md:flex-none">
+                Private Desk
+              </Link>
+              <Link href="/client-care/schedule-appointment" className="btn-secondary flex-1 md:flex-none">
+                Schedule Appointment
+              </Link>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="py-6 border-t border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
+              <p>&copy; 2026 NordLion. All rights reserved.</p>
+              <div className="flex gap-6">
+                <Link href="/legal/terms" className="hover:text-white transition-colors">
+                  Terms
+                </Link>
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">
+                  Privacy
+                </Link>
+                <Link href="/legal/compliance" className="hover:text-white transition-colors">
+                  Compliance
+                </Link>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </>
-  );
-};
+  )
+}

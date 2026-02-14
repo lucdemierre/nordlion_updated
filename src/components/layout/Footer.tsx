@@ -55,6 +55,12 @@ const footerLinks = {
 };
 
 export const Footer: React.FC = () => {
+  const [currentYear, setCurrentYear] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer
       style={{
@@ -368,7 +374,7 @@ export const Footer: React.FC = () => {
           }}
         >
           <p style={{ fontSize: '0.875rem', color: colors.gray }}>
-            © {new Date().getFullYear()} NORDLION. All rights reserved.
+            © {currentYear || '2026'} NORDLION. All rights reserved.
           </p>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <Link

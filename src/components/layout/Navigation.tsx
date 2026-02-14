@@ -198,7 +198,7 @@ export default function Navigation() {
 
             {/* Bottom CTA */}
             <div className="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6">
-              <Link href="/account" className="btn-primary flex-1 md:flex-none">
+              <Link href="/dashboard" className="btn-primary flex-1 md:flex-none">
                 Private Desk
               </Link>
               <Link href="/client-care/schedule-appointment" className="btn-secondary flex-1 md:flex-none">

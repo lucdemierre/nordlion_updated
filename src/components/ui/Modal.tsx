@@ -1,245 +1,170 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
-import { colors, transitions, borderRadius } from '@/styles/design-tokens';
+import { ReactNode, useEffect } from 'react'
+import { X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  title?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  isOpen: boolean
+  onClose: () => void
+  children: ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  title?: string
+  className?: string
 }
 
-export const Modal: React.FC<ModalProps> = ({
+const modalSizes = {
+  sm: 'max-w-md',
+  md: 'max-w-2xl',
+  lg: 'max-w-4xl',
+  xl: 'max-w-6xl',
+  full: 'max-w-full mx-4',
+}
+
+export function Modal({
   isOpen,
   onClose,
   children,
-  title,
   size = 'md',
-}) => {
+  title,
+  className,
+}: ModalProps) {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = ''
     }
     return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose])
 
-  const sizeStyles = {
-    sm: { maxWidth: '400px' },
-    md: { maxWidth: '600px' },
-    lg: { maxWidth: '800px' },
-    xl: { maxWidth: '1200px' },
-    full: { maxWidth: '100%', width: '100%', height: '100%', borderRadius: '0' },
-  };
+  if (!isOpen) return null
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: size === 'full' ? '0' : '1rem',
-      }}
+      className={cn(
+        'fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6',
+        'bg-black/90 backdrop-blur-sm',
+        'transition-opacity duration-300',
+        isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      )}
       onClick={onClose}
     >
       <div
-        style={{
-          backgroundColor: colors.darkGray,
-          borderRadius: size === 'full' ? '0' : borderRadius.xl,
-          width: '100%',
-          ...sizeStyles[size],
-          maxHeight: size === 'full' ? '100%' : '90vh',
-          overflow: 'auto',
-          position: 'relative',
-        }}
+        className={cn(
+          'relative w-full bg-[#0a0a0a] border border-white/10',
+          modalSizes[size],
+          'max-h-[90vh] overflow-y-auto scrollbar-elita',
+          'transform transition-all duration-300',
+          isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0',
+          className
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            backgroundColor: colors.darkGray,
-            padding: '1.5rem',
-            borderBottom: `1px solid ${colors.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            zIndex: 10,
-          }}
-        >
-          {title && (
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: '600',
-                color: colors.white,
-              }}
+        {/* Header */}
+        {title && (
+          <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-white/10">
+            <h2 className="text-2xl font-light text-white">{title}</h2>
+            <button
+              onClick={onClose}
+              className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+              aria-label="Close modal"
             >
-              {title}
-            </h2>
-          )}
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        )}
+
+        {/* Close button (when no title) */}
+        {!title && (
           <button
             onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: colors.gray,
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              marginLeft: 'auto',
-              transition: transitions.base,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = colors.white;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = colors.gray;
-            }}
+            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Close modal"
           >
-            ×
+            <X className="w-6 h-6" />
           </button>
+        )}
+
+        {/* Content */}
+        <div className={title ? 'p-6' : 'p-6 pt-14'}>
+          {children}
         </div>
-        <div style={{ padding: '1.5rem' }}>{children}</div>
       </div>
     </div>
-  );
-};
-
-interface DialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  title?: string;
+  )
 }
 
-export const Dialog: React.FC<DialogProps> = ({
-  isOpen,
-  onClose,
-  children,
-  title,
-}) => {
-  return <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">{children}</Modal>;
-};
-
-interface SlideInPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  title?: string;
-  side?: 'left' | 'right';
-}
-
-export const SlideInPanel: React.FC<SlideInPanelProps> = ({
+// Slide-in Panel variant
+export function SlidePanel({
   isOpen,
   onClose,
   children,
   title,
   side = 'right',
-}) => {
+}: ModalProps & { side?: 'left' | 'right' }) {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = ''
     }
     return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        zIndex: 9999,
-      }}
+      className={cn(
+        'fixed inset-0 z-50 bg-black/90 backdrop-blur-sm',
+        'transition-opacity duration-300',
+        isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      )}
       onClick={onClose}
     >
       <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          [side]: 0,
-          width: '100%',
-          maxWidth: '500px',
-          backgroundColor: colors.darkGray,
-          boxShadow: side === 'right' ? '-4px 0 20px rgba(0, 0, 0, 0.5)' : '4px 0 20px rgba(0, 0, 0, 0.5)',
-          overflow: 'auto',
-          animation: `slideIn${side === 'right' ? 'Right' : 'Left'} ${transitions.slow}`,
-        }}
+        className={cn(
+          'fixed top-0 bottom-0 w-full max-w-md bg-black border-white/10',
+          'transform transition-transform duration-300 overflow-y-auto',
+          side === 'right' ? 'right-0 border-l' : 'left-0 border-r',
+          isOpen
+            ? 'translate-x-0'
+            : side === 'right'
+            ? 'translate-x-full'
+            : '-translate-x-full'
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            backgroundColor: colors.darkGray,
-            padding: '1.5rem',
-            borderBottom: `1px solid ${colors.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            zIndex: 10,
-          }}
-        >
-          {title && (
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: '600',
-                color: colors.white,
-              }}
-            >
-              {title}
-            </h2>
-          )}
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-black border-b border-white/10">
+          <h2 className="text-2xl font-light text-white">{title}</h2>
           <button
             onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: colors.gray,
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              marginLeft: 'auto',
-              transition: transitions.base,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = colors.white;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = colors.gray;
-            }}
+            className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Close panel"
           >
-            ×
+            <X className="w-6 h-6" />
           </button>
         </div>
-        <div style={{ padding: '1.5rem' }}>{children}</div>
+
+        {/* Content */}
+        <div className="p-6">{children}</div>
       </div>
     </div>
-  );
-};
+  )
+}

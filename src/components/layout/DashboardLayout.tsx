@@ -14,24 +14,20 @@ export default function DashboardLayout({ children, requiredRole }: DashboardLay
   const router = useRouter()
 
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated()) {
+    if (typeof window !== 'undefined' && !isAuthenticated()) {
       router.push('/auth/login')
     }
-  }, [])
+  }, [router])
 
-  if (!isAuthenticated()) {
+  if (typeof window !== 'undefined' && !isAuthenticated()) {
     return null
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] pb-20">
-      {/* Main Content */}
+    <div className="min-h-screen bg-black pb-20">
       <main className="min-h-screen">
         {children}
       </main>
-
-      {/* Bottom Navigation */}
       <BottomNavbar />
     </div>
   )

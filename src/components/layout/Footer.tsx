@@ -1,181 +1,418 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, MapPin } from 'lucide-react'
+import React from 'react';
+import Link from 'next/link';
+import { colors } from '@/styles/design-tokens';
+import { Button } from '@/components/ui/Button';
 
 const footerLinks = {
-  company: [
-    { label: 'About Us', href: '/about' },
-    { label: 'Our Story', href: '/story' },
-    { label: 'Careers', href: '/careers' },
-    { label: 'Press', href: '/press' },
+  collection: [
+    { label: 'Watches', href: '/watches' },
+    { label: 'Cars', href: '/cars' },
+    { label: 'Private Jets', href: '/jets' },
+    { label: 'Yachts', href: '/yachts' },
+    { label: 'Estates', href: '/estates' },
   ],
   services: [
-    { label: 'Buy Vehicle', href: '/vehicles' },
-    { label: 'Sell Vehicle', href: '/sell' },
-    { label: 'Financing', href: '/financing' },
-    { label: 'Trade-In', href: '/trade-in' },
+    { label: 'Acquisition', href: '/services/acquisition' },
+    { label: 'Resale & Consignment', href: '/services/resale-consignment' },
+    { label: 'Authentication', href: '/services/authentication-provenance' },
+    { label: 'Valuation', href: '/services/valuation' },
+    { label: 'Collateralisation', href: '/services/collateralisation' },
+    { label: 'Vaulting & Logistics', href: '/services/vaulting-logistics' },
+    { label: 'Aftercare & Servicing', href: '/services/aftercare-servicing' },
   ],
-  support: [
-    { label: 'Contact Us', href: '/contact' },
-    { label: 'FAQ', href: '/faq' },
-    { label: 'Shipping', href: '/shipping' },
-    { label: 'Returns', href: '/returns' },
+  about: [
+    { label: 'Vision', href: '/about/vision' },
+    { label: 'Services', href: '/about/services' },
+    { label: 'Reserve Singapore', href: '/about/reserve-singapore' },
+    { label: 'History', href: '/about/history' },
+    { label: 'Foundation', href: '/about/foundation' },
+    { label: 'Press', href: '/about/press' },
+    { label: 'Careers', href: '/about/careers' },
+  ],
+  clientCare: [
+    { label: 'Submit Asset', href: '/client-care/submit-asset' },
+    { label: 'Schedule Appointment', href: '/client-care/schedule-appointment' },
+    { label: 'Aftercare', href: '/client-care/aftercare' },
+    { label: 'Warranty Claims', href: '/client-care/warranty-claims' },
+    { label: 'Concierge Support', href: '/client-care/concierge-support' },
+  ],
+  resources: [
+    { label: 'Locations', href: '/locations' },
+    { label: 'Journal', href: '/journal' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Private Desk', href: '/account' },
+    { label: 'Investors', href: '/investors/overview' },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Cookie Policy', href: '/cookies' },
+    { label: 'Terms of Service', href: '/legal/terms' },
+    { label: 'Privacy Policy', href: '/legal/privacy' },
+    { label: 'Compliance', href: '/legal/compliance' },
+    { label: 'Disclaimer', href: '/legal/disclaimer' },
+    { label: 'FAQ', href: '/legal/faq' },
   ],
-}
+};
 
-const socialLinks = [
-  { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-  { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-]
-
-export default function Footer() {
+export const Footer: React.FC = () => {
   return (
-    <footer className="bg-dark-100 border-t border-white/10">
-      <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="text-3xl font-display font-bold gradient-text mb-4 block">
-              NORDLION
-            </Link>
-            <p className="text-white/60 mb-6 leading-relaxed">
-              Elevating the luxury automotive experience with unparalleled service and
-              an exclusive collection of the world's finest vehicles.
-            </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => {
-                const Icon = social.icon
-                return (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 glass-effect rounded-lg hover:bg-primary-600/20 transition-colors group"
-                    aria-label={social.label}
-                  >
-                    <Icon size={20} className="text-white/60 group-hover:text-primary-400 transition-colors" />
-                  </a>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-primary-400 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4">Services</h3>
-            <ul className="space-y-2">
-              {footerLinks.services.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-primary-400 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4">Support</h3>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-primary-400 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-primary-400 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Contact Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-y border-white/10">
-          <div className="flex items-start space-x-3">
-            <MapPin size={20} className="text-primary-400 mt-1" />
-            <div>
-              <div className="text-white font-medium mb-1">Visit Us</div>
-              <p className="text-white/60 text-sm">
-                123 Luxury Lane, Mayfair<br />
-                London, W1K 5AB, UK
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <Phone size={20} className="text-primary-400 mt-1" />
-            <div>
-              <div className="text-white font-medium mb-1">Call Us</div>
-              <p className="text-white/60 text-sm">
-                +44 (0) 20 1234 5678<br />
-                Mon-Sat, 9AM-6PM GMT
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <Mail size={20} className="text-primary-400 mt-1" />
-            <div>
-              <div className="text-white font-medium mb-1">Email Us</div>
-              <p className="text-white/60 text-sm">
-                info@nordlionauto.com<br />
-                support@nordlionauto.com
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="pt-8 text-center text-white/50 text-sm">
-          <p>
-            © {new Date().getFullYear()} NordLion International. All rights reserved.
+    <footer
+      style={{
+        backgroundColor: colors.black,
+        borderTop: `1px solid ${colors.border}`,
+        padding: '4rem 2rem 2rem',
+      }}
+    >
+      <div style={{ maxWidth: '1920px', margin: '0 auto' }}>
+        {/* Newsletter Section */}
+        <div
+          style={{
+            marginBottom: '4rem',
+            paddingBottom: '4rem',
+            borderBottom: `1px solid ${colors.border}`,
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '2rem',
+              fontWeight: '600',
+              color: colors.white,
+              marginBottom: '1rem',
+            }}
+          >
+            Stay Connected
+          </h3>
+          <p
+            style={{
+              fontSize: '1rem',
+              color: colors.gray,
+              marginBottom: '1.5rem',
+            }}
+          >
+            Subscribe to receive updates on new acquisitions and exclusive offerings.
           </p>
+          <form
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              maxWidth: '600px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <input
+              type="email"
+              placeholder="Enter your email"
+              style={{
+                flex: 1,
+                minWidth: '250px',
+                padding: '0.75rem 1rem',
+                backgroundColor: colors.darkerGray,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '0.25rem',
+                color: colors.white,
+                fontSize: '1rem',
+              }}
+            />
+            <Button type="submit">Subscribe</Button>
+          </form>
+        </div>
+
+        {/* Links Grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '3rem',
+            marginBottom: '4rem',
+          }}
+        >
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Collection
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.collection.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Services
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.services.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              About
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.about.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Client Care
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.clientCare.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Resources
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.resources.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: colors.gray,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Legal
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {footerLinks.legal.map((link) => (
+                <li key={link.href} style={{ marginBottom: '0.75rem' }}>
+                  <Link
+                    href={link.href}
+                    style={{
+                      color: colors.lightGray,
+                      textDecoration: 'none',
+                      fontSize: '0.9375rem',
+                      transition: '200ms',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.white;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.lightGray;
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingTop: '2rem',
+            borderTop: `1px solid ${colors.border}`,
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          <p style={{ fontSize: '0.875rem', color: colors.gray }}>
+            © {new Date().getFullYear()} NORDLION. All rights reserved.
+          </p>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <Link
+              href="#"
+              style={{ color: colors.gray, transition: '200ms' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="Instagram"
+            >
+              Instagram
+            </Link>
+            <Link
+              href="#"
+              style={{ color: colors.gray, transition: '200ms' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="LinkedIn"
+            >
+              LinkedIn
+            </Link>
+            <Link
+              href="#"
+              style={{ color: colors.gray, transition: '200ms' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="Twitter"
+            >
+              Twitter
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};

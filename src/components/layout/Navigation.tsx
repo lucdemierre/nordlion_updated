@@ -1,163 +1,284 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Menu, X, User, ShoppingCart } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { colors, transitions } from '@/styles/design-tokens';
 
-const navItems = [
-  { label: 'Inventory', href: '/inventory' },
-  { label: 'About', href: '/about' },
-  { label: 'Services', href: '/services' },
-  { label: 'Contact', href: '/contact' },
-]
+const menuItems = [
+  {
+    title: 'Collection',
+    items: [
+      { label: 'Watches', href: '/watches' },
+      { label: 'Cars', href: '/cars' },
+      { label: 'Private Jets', href: '/jets' },
+      { label: 'Yachts', href: '/yachts' },
+      { label: 'Estates', href: '/estates' },
+    ],
+  },
+  {
+    title: 'Services',
+    items: [
+      { label: 'Acquisition', href: '/services/acquisition' },
+      { label: 'Resale & Consignment', href: '/services/resale-consignment' },
+      { label: 'Authentication & Provenance', href: '/services/authentication-provenance' },
+      { label: 'Valuation', href: '/services/valuation' },
+      { label: 'Collateralisation', href: '/services/collateralisation' },
+      { label: 'Vaulting & Logistics', href: '/services/vaulting-logistics' },
+      { label: 'Aftercare & Servicing', href: '/services/aftercare-servicing' },
+    ],
+  },
+  {
+    title: 'About',
+    items: [
+      { label: 'Vision', href: '/about/vision' },
+      { label: 'Services', href: '/about/services' },
+      { label: 'Reserve Singapore', href: '/about/reserve-singapore' },
+      { label: 'History', href: '/about/history' },
+      { label: 'Foundation', href: '/about/foundation' },
+      { label: 'Press', href: '/about/press' },
+      { label: 'Careers', href: '/about/careers' },
+    ],
+  },
+  {
+    title: 'Client Care',
+    items: [
+      { label: 'Submit Asset', href: '/client-care/submit-asset' },
+      { label: 'Schedule Appointment', href: '/client-care/schedule-appointment' },
+      { label: 'Aftercare', href: '/client-care/aftercare' },
+      { label: 'Warranty Claims', href: '/client-care/warranty-claims' },
+      { label: 'Concierge Support', href: '/client-care/concierge-support' },
+    ],
+  },
+  {
+    title: 'More',
+    items: [
+      { label: 'Locations', href: '/locations' },
+      { label: 'Journal', href: '/journal' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Private Desk', href: '/account' },
+    ],
+  },
+];
 
-export default function Navigation() {
-  const pathname = usePathname()
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const isActive = (href: string) => pathname === href
+export const Navigation: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-[#0a0a0a]/95 backdrop-blur-xl shadow-2xl border-b border-white/5'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
+    <>
+      <nav
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: `1px solid ${colors.border}`,
+          zIndex: 1000,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1920px',
+            margin: '0 auto',
+            padding: '1rem 2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Hamburger Menu */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: colors.white,
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              transition: transitions.base,
+            }}
+            aria-label="Toggle menu"
+          >
+            <span
+              style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: colors.white,
+                transition: transitions.base,
+                transform: isMenuOpen ? 'rotate(45deg) translateY(6px)' : 'none',
+              }}
+            />
+            <span
+              style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: colors.white,
+                transition: transitions.base,
+                opacity: isMenuOpen ? 0 : 1,
+              }}
+            />
+            <span
+              style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: colors.white,
+                transition: transitions.base,
+                transform: isMenuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none',
+              }}
+            />
+          </button>
+
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
+          <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <span
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: colors.white,
+                letterSpacing: '0.1em',
+              }}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#D67C3C] to-[#B85A1F] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">NL</span>
-              </div>
-              <span className="text-2xl font-bold text-white group-hover:text-[#D67C3C] transition-colors">
-                NORDLION
-              </span>
-            </motion.div>
+              NORDLION
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item, index) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link
-                  href={item.href}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all relative ${
-                    isActive(item.href)
-                      ? 'text-[#D67C3C] bg-[#D67C3C]/10'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center space-x-3">
+          {/* Right Icons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <Link
-              href="/dashboard"
-              className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+              href="/locations"
+              style={{
+                color: colors.gray,
+                transition: transitions.base,
+                fontSize: '1.25rem',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="Locations"
             >
-              <User size={20} />
-              <span>Dashboard</span>
-            </Link>
-            <Link 
-              href="/cart" 
-              className="p-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all relative"
-            >
-              <ShoppingCart size={20} />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#D67C3C] text-white text-xs rounded-full flex items-center justify-center">
-                0
-              </span>
+              📍
             </Link>
             <Link
               href="/contact"
-              className="px-6 py-2.5 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg font-medium transition-colors"
+              style={{
+                color: colors.gray,
+                transition: transitions.base,
+                fontSize: '1.25rem',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="Contact"
             >
-              Get Started
+              ✉️
             </Link>
+            <button
+              style={{
+                background: 'none',
+                border: 'none',
+                color: colors.gray,
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                transition: transitions.base,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.gray;
+              }}
+              aria-label="Search"
+            >
+              🔍
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5"
+      {/* Full-Screen Overlay Menu */}
+      {isMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: colors.black,
+            zIndex: 999,
+            overflow: 'auto',
+            paddingTop: '5rem',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1400px',
+              margin: '0 auto',
+              padding: '2rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '3rem',
+            }}
           >
-            <div className="max-w-7xl mx-auto px-6 py-6 space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive(item.href)
-                      ? 'text-[#D67C3C] bg-[#D67C3C]/10'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+            {menuItems.map((section) => (
+              <div key={section.title}>
+                <h3
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: colors.gray,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    marginBottom: '1.5rem',
+                  }}
                 >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-white/10 space-y-2">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <User size={20} />
-                  <span>Dashboard</span>
-                </Link>
-                <Link
-                  href="/contact"
-                  className="block px-4 py-3 bg-[#D67C3C] hover:bg-[#B85A1F] text-white text-center rounded-lg font-medium transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Get Started
-                </Link>
+                  {section.title}
+                </h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {section.items.map((item) => (
+                    <li key={item.href} style={{ marginBottom: '1rem' }}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        style={{
+                          fontSize: '1.5rem',
+                          fontWeight: '500',
+                          color: colors.lightGray,
+                          textDecoration: 'none',
+                          transition: transitions.base,
+                          display: 'block',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = colors.white;
+                          e.currentTarget.style.paddingLeft = '1rem';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = colors.lightGray;
+                          e.currentTarget.style.paddingLeft = '0';
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
-  )
-}
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+};

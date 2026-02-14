@@ -42,7 +42,7 @@ const footerLinks = {
     { label: 'Locations', href: '/locations' },
     { label: 'Journal', href: '/journal' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Private Desk', href: '/account' },
+    { label: 'Private Desk', href: '/dashboard' },
     { label: 'Investors', href: '/investors/overview' },
   ],
   legal: [
@@ -104,6 +104,7 @@ export const Footer: React.FC = () => {
               maxWidth: '600px',
               flexWrap: 'wrap',
             }}
+            onSubmit={(e) => e.preventDefault()}
           >
             <input
               type="email"

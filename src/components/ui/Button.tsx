@@ -1,156 +1,93 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-import { colors, transitions, borderRadius } from '@/styles/design-tokens';
+import { ButtonHTMLAttributes, AnchorHTMLAttributes } from 'react';
 
-interface ButtonProps {
-  children: React.ReactNode;
+type BaseProps = {
   variant?: 'primary' | 'secondary' | 'text';
   size?: 'sm' | 'md' | 'lg';
-  href?: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  fullWidth?: boolean;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
-}
+  fullWidth?: 'boolean';
+  children: React.ReactNode;
+};
 
-export const Button: React.FC<ButtonProps> = ({
-  children,
+type ButtonAsButton = BaseProps &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof BaseProps> & {
+    href?: never;
+  };
+
+type ButtonAsLink = BaseProps &
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof BaseProps> & {
+    href: string;
+  };
+
+type ButtonProps = ButtonAsButton | ButtonAsLink;
+
+export function Button({
   variant = 'primary',
   size = 'md',
-  href,
-  onClick,
-  disabled = false,
   fullWidth = false,
+  children,
   className = '',
-  type = 'button',
-}) => {
-  const baseStyles = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: 'inherit',
-    fontWeight: '500',
-    textAlign: 'center' as const,
-    textDecoration: 'none',
-    border: 'none',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: transitions.base,
-    borderRadius: borderRadius.base,
-    opacity: disabled ? 0.5 : 1,
-    width: fullWidth ? '100%' : 'auto',
+  ...props
+}: ButtonProps) {
+  const baseStyles = `
+    inline-flex items-center justify-center
+    font-medium transition-all duration-300
+    disabled:opacity-50 disabled:cursor-not-allowed
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black
+    ${fullWidth ? 'w-full' : ''}
+  `;
+
+  const variants = {
+    primary: `
+      bg-[#ff4d6d] text-white
+      hover:bg-[#ff3355]
+      focus:ring-[#ff4d6d]
+    `,
+    secondary: `
+      bg-transparent text-white
+      border border-white/20
+      hover:border-[#ff4d6d] hover:text-[#ff4d6d]
+      focus:ring-white
+    `,
+    text: `
+      bg-transparent text-white
+      hover:text-[#ff4d6d]
+      focus:ring-[#ff4d6d]
+    `,
   };
 
-  const variantStyles = {
-    primary: {
-      backgroundColor: colors.primary,
-      color: colors.white,
-      padding: size === 'sm' ? '0.5rem 1rem' : size === 'lg' ? '1rem 2rem' : '0.75rem 1.5rem',
-      fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
-      ':hover': {
-        backgroundColor: colors.primaryHover,
-      },
-    },
-    secondary: {
-      backgroundColor: 'transparent',
-      color: colors.white,
-      border: `1px solid ${colors.white}`,
-      padding: size === 'sm' ? '0.5rem 1rem' : size === 'lg' ? '1rem 2rem' : '0.75rem 1.5rem',
-      fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
-      ':hover': {
-        backgroundColor: colors.white,
-        color: colors.black,
-      },
-    },
-    text: {
-      backgroundColor: 'transparent',
-      color: colors.lightGray,
-      padding: size === 'sm' ? '0.25rem 0.5rem' : size === 'lg' ? '0.5rem 1rem' : '0.375rem 0.75rem',
-      fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
-      ':hover': {
-        color: colors.white,
-      },
-    },
+  const sizes = {
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg',
   };
 
-  const combinedStyles = {
-    ...baseStyles,
-    ...variantStyles[variant],
-  };
+  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`.trim();
 
-  const content = (
-    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-      {children}
-    </span>
-  );
-
-  if (href && !disabled) {
+  if ('href' in props && props.href) {
     return (
-      <Link
-        href={href}
-        style={combinedStyles}
-        className={className}
-        onMouseEnter={(e) => {
-          if (variant === 'primary') {
-            e.currentTarget.style.backgroundColor = colors.primaryHover;
-          } else if (variant === 'secondary') {
-            e.currentTarget.style.backgroundColor = colors.white;
-            e.currentTarget.style.color = colors.black;
-          } else if (variant === 'text') {
-            e.currentTarget.style.color = colors.white;
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (variant === 'primary') {
-            e.currentTarget.style.backgroundColor = colors.primary;
-          } else if (variant === 'secondary') {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = colors.white;
-          } else if (variant === 'text') {
-            e.currentTarget.style.color = colors.lightGray;
-          }
-        }}
-      >
-        {content}
+      <Link href={props.href} className={classes} {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}>
+        {children}
       </Link>
     );
   }
 
   return (
-    <button
-      type={type}
-      style={combinedStyles}
-      onClick={onClick}
-      disabled={disabled}
-      className={className}
-      onMouseEnter={(e) => {
-        if (!disabled) {
-          if (variant === 'primary') {
-            e.currentTarget.style.backgroundColor = colors.primaryHover;
-          } else if (variant === 'secondary') {
-            e.currentTarget.style.backgroundColor = colors.white;
-            e.currentTarget.style.color = colors.black;
-          } else if (variant === 'text') {
-            e.currentTarget.style.color = colors.white;
-          }
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled) {
-          if (variant === 'primary') {
-            e.currentTarget.style.backgroundColor = colors.primary;
-          } else if (variant === 'secondary') {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = colors.white;
-          } else if (variant === 'text') {
-            e.currentTarget.style.color = colors.lightGray;
-          }
-        }
-      }}
-    >
-      {content}
+    <button className={classes} {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {children}
     </button>
   );
-};
+}
+
+export function PrimaryButton(props: Omit<ButtonProps, 'variant'>) {
+  return <Button variant="primary" {...props} />;
+}
+
+export function SecondaryButton(props: Omit<ButtonProps, 'variant'>) {
+  return <Button variant="secondary" {...props} />;
+}
+
+export function TextButton(props: Omit<ButtonProps, 'variant'>) {
+  return <Button variant="text" {...props} />;
+}

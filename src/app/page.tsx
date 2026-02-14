@@ -2,425 +2,465 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Car, Shield, Award, Clock, CheckCircle, Star, Menu, X } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { ArrowRight, Search, Shield, Clock, Globe, Award, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function HomePage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [activeCategory, setActiveCategory] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
+      setScrolled(window.scrollY > 30)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const features = [
+  // Asset Categories - Mirroring ELITA's structure
+  const categories = [
+    { name: 'WATCHES', href: '/collection/watches', featured: 'Patek Philippe, Rolex, Richard Mille' },
+    { name: 'CARS', href: '/collection/cars', featured: 'Ferrari, McLaren, Koenigsegg' },
+    { name: 'JETS', href: '/collection/jets', featured: 'Gulfstream, Bombardier, Dassault' },
+    { name: 'YACHTS', href: '/collection/yachts', featured: 'Azimut, Sunseeker, Riva' },
+    { name: 'ESTATES', href: '/collection/estates', featured: 'Prime Properties Worldwide' }
+  ]
+
+  // Recent Mandates - Similar to ELITA's placements showcase
+  const recentPlacements = [
     {
-      icon: Car,
-      title: 'Curated Collection',
-      description: 'Hand-picked luxury vehicles from the world\'s most prestigious manufacturers'
+      asset: 'PATEK PHILIPPE',
+      model: 'NAUTILUS 5711/1A',
+      origin: 'Geneva',
+      destination: 'Singapore',
+      brief: 'High-net-worth collector sought allocation-only reference. NordLion coordinated through verified boutique channels, arranged authentication at manufacture, and executed white-glove delivery with full documentation.',
+      timeline: '14 Days',
+      status: 'COMPLETE',
+      date: 'JAN 2026'
     },
     {
-      icon: Shield,
-      title: 'Verified Authenticity',
-      description: 'Every vehicle undergoes rigorous inspection and certification process'
+      asset: 'MCLAREN',
+      model: 'SENNA GTR',
+      origin: 'Woking, UK',
+      destination: 'Dubai, UAE',
+      brief: 'Private client required track-focused hypercar with factory MSO specification. NordLion facilitated factory liaison, export documentation, and specialist enclosed transport with full service history verification.',
+      timeline: '28 Days',
+      status: 'COMPLETE',
+      date: 'DEC 2025'
     },
     {
-      icon: Award,
-      title: 'Concierge Service',
-      description: 'Personalized assistance throughout your entire purchasing journey'
-    },
-    {
-      icon: Clock,
-      title: 'Global Delivery',
-      description: 'Secure, white-glove delivery to your location anywhere in the world'
+      asset: 'GULFSTREAM',
+      model: 'G650ER',
+      origin: 'Savannah, USA',
+      destination: 'London, UK',
+      brief: 'Family office sought ultra-long-range capability with bespoke interior. NordLion coordinated pre-purchase inspection, regulatory compliance, and cross-border positioning with full airworthiness certification.',
+      timeline: '45 Days',
+      status: 'COMPLETE',
+      date: 'NOV 2025'
     }
   ]
 
-  const vehicles = [
+  // Service Pillars
+  const services = [
     {
-      make: 'Bugatti',
-      model: 'Chiron Super Sport',
-      price: '£3,900,000',
-      image: 'https://images.unsplash.com/photo-1566023888012-f8f9c6da149a?w=800',
-      status: 'Available'
+      title: 'ACQUIRE & SOURCE',
+      description: 'Discreet sourcing across primary markets, private networks, and vetted partners—focused on provenance and condition.',
+      href: '/services/acquisition'
     },
     {
-      make: 'Pagani',
-      model: 'Huayra Roadster BC',
-      price: '£3,500,000',
-      image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800',
-      status: 'Reserved'
+      title: 'VERIFY & AUTHENTICATE',
+      description: 'Specialist verification through certified experts—supporting documentation and clear risk control.',
+      href: '/services/authentication'
     },
     {
-      make: 'Ferrari',
-      model: '296 GTB',
-      price: '£325,000',
-      image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800',
-      status: 'Available'
-    }
-  ]
-
-  const testimonials = [
-    {
-      name: 'James Anderson',
-      role: 'Collector',
-      rating: 5,
-      text: 'The most professional and seamless experience I\'ve had purchasing a hypercar. Their attention to detail is unmatched.'
+      title: 'VAULT & CUSTODY',
+      description: 'Secure custody with appointment-based intake, vault-to-vault coordination, and institutional-grade reporting.',
+      href: '/services/custody'
     },
     {
-      name: 'Sarah Mitchell',
-      role: 'Entrepreneur',
-      rating: 5,
-      text: 'NordLion made my dream of owning a Lamborghini a reality. The concierge service was exceptional from start to finish.'
+      title: 'FINANCE & COLLATERALISE',
+      description: 'Liquidity against qualifying assets with insured logistics—clean terms, discreet onboarding, efficient settlement.',
+      href: '/services/collateralisation'
     },
     {
-      name: 'Michael Chen',
-      role: 'Investment Banker',
-      rating: 5,
-      text: 'Outstanding collection of rare vehicles. The verification process gave me complete confidence in my purchase.'
+      title: 'TRADE & UPGRADE',
+      description: 'Portfolio rotation without friction—validate both sides, secure custody, and structured settlement.',
+      href: '/services/trade'
+    },
+    {
+      title: 'GLOBAL LOGISTICS',
+      description: 'Fully insured worldwide delivery through institutional partners—vault-to-vault transfers across 1,200+ cities.',
+      href: '/services/logistics'
     }
   ]
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f]">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[var(--color-bg-primary)] text-white">
+      {/* Refined Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5' : 'bg-transparent'
+        scrolled 
+          ? 'bg-[var(--color-bg-primary)]/95 backdrop-blur-xl border-b border-[var(--color-border-primary)]' 
+          : 'bg-transparent'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-2xl font-light text-white">
-              NordLion
+        <div className="section-container">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="text-xl font-light tracking-wider text-white hover:text-[var(--color-accent-primary)] transition-colors">
+              NORDLION
             </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/inventory" className="text-white/70 hover:text-white transition-colors">
-                Inventory
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-8">
+              <Link href="/collection" className="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors tracking-wide">
+                COLLECTIONS
               </Link>
-              <Link href="/about" className="text-white/70 hover:text-white transition-colors">
-                About
+              <Link href="/services" className="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors tracking-wide">
+                SERVICES
               </Link>
-              <Link href="/services" className="text-white/70 hover:text-white transition-colors">
-                Services
+              <Link href="/about" className="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors tracking-wide">
+                ABOUT
               </Link>
-              <Link href="/contact" className="text-white/70 hover:text-white transition-colors">
-                Contact
+              <Link href="/journal" className="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors tracking-wide">
+                JOURNAL
               </Link>
+              <Link href="/contact" className="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors tracking-wide">
+                CONTACT
+              </Link>
+              
+              <div className="h-4 w-px bg-[var(--color-border-primary)]"></div>
+              
+              <button className="text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                <Search size={18} />
+              </button>
+              
               <Link
-                href="/auth/login"
-                className="px-6 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-colors"
+                href="/account"
+                className="px-5 py-2 bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-hover)] text-black text-sm font-medium tracking-wide rounded-md transition-colors"
               >
-                Login
+                PRIVATE DESK
               </Link>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-white"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 space-y-4">
-              <Link href="/inventory" className="block text-white/70 hover:text-white transition-colors">
-                Inventory
-              </Link>
-              <Link href="/about" className="block text-white/70 hover:text-white transition-colors">
-                About
-              </Link>
-              <Link href="/services" className="block text-white/70 hover:text-white transition-colors">
-                Services
-              </Link>
-              <Link href="/contact" className="block text-white/70 hover:text-white transition-colors">
-                Contact
-              </Link>
-              <Link
-                href="/auth/login"
-                className="block px-6 py-2 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-colors text-center"
-              >
-                Login
-              </Link>
-            </div>
-          )}
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=1920"
-            alt="Luxury Vehicle"
-            className="w-full h-full object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f0f0f]/50 to-[#0f0f0f]"></div>
+      {/* Hero Section - Institutional & Refined */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Minimal Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(212,165,116,0.03),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,var(--color-bg-primary)_95%)]" />
         </div>
 
-        <div className="relative z-10 text-center px-6 max-w-5xl">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl font-light text-white mb-6"
-          >
-            Redefining Luxury
-            <br />
-            <span className="text-[#D67C3C]">Automotive Excellence</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl text-white/70 mb-8 font-light"
-          >
-            Discover the world's most exclusive collection of hypercars and luxury vehicles
-          </motion.p>
+        {/* Hero Content */}
+        <div className="relative z-10 section-container text-center py-32">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex gap-4 justify-center flex-wrap"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-8"
           >
-            <Link
-              href="/inventory"
-              className="px-8 py-4 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-all flex items-center gap-2 group"
-            >
-              Explore Collection
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/contact"
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all border border-white/10"
-            >
-              Contact Us
-            </Link>
+            {/* Overline */}
+            <div className="text-label text-[var(--color-accent-primary)]">
+              NORDLION PRIVATE LUXURY DESK
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-headline max-w-5xl mx-auto">
+              INSTITUTIONAL-GRADE
+              <br />
+              <span className="text-[var(--color-text-secondary)]">PASSION ASSET PLATFORM</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-body-large max-w-2xl mx-auto">
+              Discreet acquisition, authentication, custody, and placement of ultra-luxury assets through verified networks and institutional protocols.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+              <Link href="/collection" className="btn-primary">
+                DISCOVER COLLECTION
+                <ArrowRight size={16} />
+              </Link>
+              <Link href="/services" className="btn-secondary">
+                PRIVATE DESK SERVICES
+              </Link>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="flex items-center justify-center gap-8 pt-12 text-xs text-[var(--color-text-tertiary)] tracking-wider">
+              <div className="flex items-center gap-2">
+                <Shield size={14} />
+                <span>VERIFIED NETWORK</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe size={14} />
+                <span>GLOBAL LOGISTICS</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award size={14} />
+                <span>INSTITUTIONAL CUSTODY</span>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-4">
-              Why Choose <span className="text-[#D67C3C]">NordLion</span>
-            </h2>
-            <p className="text-white/60 text-lg">The pinnacle of luxury automotive acquisition</p>
-          </motion.div>
+      {/* Categories - Clean Grid */}
+      <section className="section-container section-padding border-t border-[var(--color-border-primary)]">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {categories.map((category, index) => (
+            <Link
+              key={index}
+              href={category.href}
+              className="group relative aspect-square bg-[var(--color-bg-elevated)] border border-[var(--color-border-primary)] hover:border-[var(--color-border-accent)] rounded-lg overflow-hidden transition-all"
+            >
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                <h3 className="text-lg font-medium tracking-wider mb-2 group-hover:text-[var(--color-accent-primary)] transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
+                  {category.featured}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-[#141414] border border-white/5 rounded-xl p-8 hover:border-[#D67C3C]/50 transition-all"
-                >
-                  <div className="w-12 h-12 bg-[#D67C3C]/10 rounded-lg flex items-center justify-center mb-4">
-                    <Icon size={24} className="text-[#D67C3C]" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-white/60 font-light">{feature.description}</p>
-                </motion.div>
-              )
-            })}
+      {/* Recent Placements - Case Study Style */}
+      <section className="section-container section-padding">
+        <div className="space-y-16">
+          {/* Section Header */}
+          <div className="max-w-3xl">
+            <h4 className="text-label mb-4">RECENT MANDATES</h4>
+            <h2 className="text-subheadline mb-6">VERIFIED EXECUTION</h2>
+            <p className="text-body-large">
+              Case studies demonstrating our network reach, verification protocols, and institutional settlement capabilities.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Featured Vehicles */}
-      <section className="py-24 px-6 bg-[#0a0a0a]">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-4">
-              Featured <span className="text-[#D67C3C]">Collection</span>
-            </h2>
-            <p className="text-white/60 text-lg">Rare and exclusive vehicles available now</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {vehicles.map((vehicle, index) => (
+          {/* Placement Cards */}
+          <div className="space-y-6">
+            {recentPlacements.map((placement, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden hover:border-[#D67C3C]/50 transition-all group"
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="card-elevated p-8 hover:border-[var(--color-border-accent)] transition-all"
               >
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={vehicle.image}
-                    alt={`${vehicle.make} ${vehicle.model}`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-[#D67C3C] text-white text-sm rounded-full">
-                    {vehicle.status}
+                <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
+                  {/* Main Content */}
+                  <div className="space-y-6">
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="badge badge-available">{placement.status}</span>
+                        <span className="text-label">{placement.date}</span>
+                      </div>
+                      <h3 className="text-3xl font-light mb-2">
+                        {placement.asset}
+                      </h3>
+                      <h4 className="text-xl text-[var(--color-accent-primary)] font-light mb-4">
+                        {placement.model}
+                      </h4>
+                      <div className="flex items-center gap-6 text-sm text-[var(--color-text-tertiary)]">
+                        <span>{placement.origin}</span>
+                        <ArrowRight size={14} />
+                        <span>{placement.destination}</span>
+                      </div>
+                    </div>
+                    
+                    <p className="text-[var(--color-text-secondary)] leading-relaxed">
+                      {placement.brief}
+                    </p>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-semibold text-white mb-2">
-                    {vehicle.make} {vehicle.model}
-                  </h3>
-                  <p className="text-2xl text-[#D67C3C] font-bold mb-4">{vehicle.price}</p>
-                  <Link
-                    href="/inventory"
-                    className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
-                  >
-                    View Details <ArrowRight size={16} />
-                  </Link>
+
+                  {/* Metadata */}
+                  <div className="flex lg:flex-col justify-between lg:justify-start gap-6">
+                    <div>
+                      <div className="text-label mb-2">TIMELINE</div>
+                      <div className="text-2xl font-light">{placement.timeline}</div>
+                    </div>
+                    <button className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] transition-colors flex items-center gap-2 text-sm tracking-wide">
+                      FULL CASE STUDY
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
-
-          <div className="text-center mt-12">
-            <Link
-              href="/inventory"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-all"
-            >
-              View Full Collection <ArrowRight size={20} />
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-4">
-              Client <span className="text-[#D67C3C]">Testimonials</span>
-            </h2>
-            <p className="text-white/60 text-lg">Hear from our distinguished clientele</p>
-          </motion.div>
+      {/* Services Grid */}
+      <section className="section-container section-padding bg-[var(--color-bg-secondary)]">
+        <div className="space-y-16">
+          <div className="text-center max-w-3xl mx-auto">
+            <h4 className="text-label mb-4">PRIVATE DESK PROTOCOL</h4>
+            <h2 className="text-subheadline mb-6">INSTITUTIONAL EXECUTION</h2>
+            <p className="text-body-large">
+              Six pillars supporting discreet, secure, and compliant asset management across all categories.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service, index) => (
+              <Link
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-[#141414] border border-white/5 rounded-xl p-8"
+                href={service.href}
+                className="group card-elevated p-8 hover:border-[var(--color-border-accent)] transition-all"
               >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} size={20} className="text-[#D67C3C] fill-[#D67C3C]" />
-                  ))}
+                <div className="space-y-4">
+                  <h3 className="text-xl font-medium tracking-wide group-hover:text-[var(--color-accent-primary)] transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="text-[var(--color-text-secondary)] leading-relaxed text-sm">
+                    {service.description}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-[var(--color-text-tertiary)] group-hover:text-[var(--color-accent-primary)] transition-colors">
+                    EXPLORE PROTOCOL
+                    <ChevronRight size={14} />
+                  </div>
                 </div>
-                <p className="text-white/70 mb-6 font-light italic">"{testimonial.text}"</p>
-                <div>
-                  <p className="text-white font-semibold">{testimonial.name}</p>
-                  <p className="text-white/50 text-sm">{testimonial.role}</p>
-                </div>
-              </motion.div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-b from-[#0f0f0f] to-[#0a0a0a]">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-6">
-              Ready to Experience
+      <section className="section-container section-padding text-center">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="space-y-6">
+            <h2 className="text-subheadline">
+              ACCESS THE
               <br />
-              <span className="text-[#D67C3C]">Automotive Excellence?</span>
+              <span className="text-[var(--color-accent-primary)]">PRIVATE DESK</span>
             </h2>
-            <p className="text-white/60 text-lg mb-8">
-              Join the elite circle of NordLion collectors and enthusiasts
+            <p className="text-body-large">
+              Institutional protocols, verified networks, and white-glove execution for ultra-high-net-worth clients.
             </p>
-            <Link
-              href="/auth/register"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#D67C3C] hover:bg-[#B85A1F] text-white rounded-lg transition-all text-lg"
-            >
-              Get Started Today <ArrowRight size={24} />
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/account" className="btn-primary">
+              OPEN PRIVATE DESK
+              <ArrowRight size={16} />
             </Link>
-          </motion.div>
+            <Link href="/contact" className="btn-secondary">
+              SCHEDULE CONSULTATION
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="text-2xl font-light text-white mb-4">NordLion</h3>
-              <p className="text-white/50 text-sm font-light">
-                The world's premier destination for luxury and exotic vehicles.
+      {/* Footer - Minimal & Refined */}
+      <footer className="border-t border-[var(--color-border-primary)] py-12">
+        <div className="section-container">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+            {/* Brand */}
+            <div className="lg:col-span-1">
+              <Link href="/" className="text-xl font-light tracking-wider">
+                NORDLION
+              </Link>
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-4 leading-relaxed">
+                Private luxury desk for passion assets
               </p>
             </div>
+
+            {/* Collections */}
             <div>
-              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+              <h4 className="text-label mb-4">COLLECTIONS</h4>
               <div className="space-y-2">
-                <Link href="/inventory" className="block text-white/50 hover:text-white transition-colors text-sm">
-                  Inventory
+                {categories.map((cat, i) => (
+                  <Link key={i} href={cat.href} className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4 className="text-label mb-4">SERVICES</h4>
+              <div className="space-y-2">
+                <Link href="/services/acquisition" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Acquisition
                 </Link>
-                <Link href="/about" className="block text-white/50 hover:text-white transition-colors text-sm">
-                  About Us
+                <Link href="/services/authentication" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Authentication
                 </Link>
-                <Link href="/services" className="block text-white/50 hover:text-white transition-colors text-sm">
-                  Services
+                <Link href="/services/custody" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Custody & Vaulting
                 </Link>
-                <Link href="/contact" className="block text-white/50 hover:text-white transition-colors text-sm">
+                <Link href="/services/collateralisation" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Collateralisation
+                </Link>
+                <Link href="/services/logistics" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Global Logistics
+                </Link>
+              </div>
+            </div>
+
+            {/* About */}
+            <div>
+              <h4 className="text-label mb-4">ABOUT</h4>
+              <div className="space-y-2">
+                <Link href="/about/vision" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Vision
+                </Link>
+                <Link href="/about/network" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Network
+                </Link>
+                <Link href="/journal" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Journal
+                </Link>
+                <Link href="/about/careers" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Careers
+                </Link>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-label mb-4">CLIENT CARE</h4>
+              <div className="space-y-2">
+                <Link href="/contact" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
                   Contact
                 </Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Services</h4>
-              <div className="space-y-2">
-                <p className="text-white/50 text-sm">Vehicle Sourcing</p>
-                <p className="text-white/50 text-sm">Concierge Service</p>
-                <p className="text-white/50 text-sm">Global Delivery</p>
-                <p className="text-white/50 text-sm">After-Sales Support</p>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-white/50 text-sm">
-                <p>London, United Kingdom</p>
-                <p>info@nordlion.com</p>
-                <p>+44 20 1234 5678</p>
+                <Link href="/submit-asset" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Submit Asset
+                </Link>
+                <Link href="/schedule" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Schedule Appointment
+                </Link>
+                <Link href="/account" className="block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+                  Private Desk
+                </Link>
               </div>
             </div>
           </div>
-          <div className="border-t border-white/5 pt-8 text-center text-white/50 text-sm">
-            <p>&copy; 2026 NordLion. All rights reserved.</p>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-[var(--color-border-primary)] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              © 2026 NordLion. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6 text-xs text-[var(--color-text-tertiary)]">
+              <Link href="/legal/terms" className="hover:text-white transition-colors">
+                Terms
+              </Link>
+              <Link href="/legal/privacy" className="hover:text-white transition-colors">
+                Privacy
+              </Link>
+              <Link href="/legal/compliance" className="hover:text-white transition-colors">
+                Compliance
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

@@ -1,125 +1,136 @@
 'use client'
 
-import Navigation from '@/components/shared/Navigation'
-import Footer from '@/components/shared/Footer'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle } from 'lucide-react'
+import { Check } from 'lucide-react'
+import Navigation from '@/components/layout/Navigation'
+import Footer from '@/components/layout/Footer'
+import { Button } from '@/components/ui/Button'
 
 export default function AcquisitionPage() {
+  const features = [
+    'Access to allocation-only pieces',
+    'Private network of vetted dealers',
+    'Direct boutique relationships',
+    'Auction house coordination',
+    'Private collector outreach',
+    'Full provenance verification',
+  ]
+
+  const process = [
+    {
+      step: '01',
+      title: 'Brief Submission',
+      description: 'Submit detailed requirements including brand, model, specifications, condition, and budget parameters.',
+    },
+    {
+      step: '02',
+      title: 'Network Activation',
+      description: 'Our acquisition team engages verified sources across global markets through discreet channels.',
+    },
+    {
+      step: '03',
+      title: 'Verification & Due Diligence',
+      description: 'Each candidate asset undergoes authentication, condition assessment, and provenance verification.',
+    },
+    {
+      step: '04',
+      title: 'Presentation & Approval',
+      description: 'Receive detailed documentation with imagery, specifications, and pricing for review.',
+    },
+    {
+      step: '05',
+      title: 'Secure Settlement',
+      description: 'Upon approval, we coordinate payment, logistics, and white-glove delivery to your preferred location.',
+    },
+  ]
+
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] text-white">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
 
-      <section className="relative pt-32 pb-20">
-        <div className="section-container">
-          <div className="max-w-3xl">
-            <h4 className="text-label mb-4">SERVICES</h4>
-            <h1 className="text-headline mb-6">ACQUISITION</h1>
-            <p className="text-body-large">
-              Discreet sourcing across primary allocations, private networks, and vetted secondary channels—focused on provenance verification, condition assessment, and institutional settlement protocols.
+      {/* Hero */}
+      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black z-10" />
+        <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] bg-cover bg-center" />
+        
+        <div className="relative z-20 container-elita text-center">
+          <div className="fade-in">
+            <div className="text-xs tracking-[0.3em] text-[#ff6b35] uppercase mb-4 font-light">
+              SERVICES
+            </div>
+            <h1 className="heading-1 mb-6">ACQUISITION & SOURCING</h1>
+            <p className="body-lg max-w-3xl mx-auto">
+              Discreet sourcing of exceptional assets through verified networks, private channels, and institutional relationships.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="section-container section-padding">
-        <div className="grid lg:grid-cols-2 gap-16">
-          <div>
-            <h2 className="text-subheadline mb-8">PROTOCOL OVERVIEW</h2>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <CheckCircle className="text-[var(--color-accent-primary)] flex-shrink-0" size={20} />
-                <div>
-                  <h4 className="font-medium mb-2">Primary Market Access</h4>
-                  <p className="text-[var(--color-text-secondary)] text-sm">Direct relationships with authorized dealers, boutiques, and manufacturer representatives for allocation-based assets.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle className="text-[var(--color-accent-primary)] flex-shrink-0" size={20} />
-                <div>
-                  <h4 className="font-medium mb-2">Private Network Sourcing</h4>
-                  <p className="text-[var(--color-text-secondary)] text-sm">Confidential inquiries through verified collector networks, family offices, and institutional holders.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle className="text-[var(--color-accent-primary)] flex-shrink-0" size={20} />
-                <div>
-                  <h4 className="font-medium mb-2">Condition & Provenance</h4>
-                  <p className="text-[var(--color-text-secondary)] text-sm">Specialist inspection, service history verification, and chain of custody documentation before commitment.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle className="text-[var(--color-accent-primary)] flex-shrink-0" size={20} />
-                <div>
-                  <h4 className="font-medium mb-2">Secure Settlement</h4>
-                  <p className="text-[var(--color-text-secondary)] text-sm">Escrow coordination, payment verification, and insured delivery through institutional logistics partners.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Overview */}
+      <section className="container-elita section-padding">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="heading-3 mb-8 text-center">INSTITUTIONAL ACCESS</h2>
+          <p className="body-md text-center mb-12">
+            Our acquisition protocol provides access to allocation-only timepieces, limited-production vehicles, and off-market opportunities through established dealer relationships and private networks spanning 45+ countries.
+          </p>
 
-          <div className="card-elevated p-8">
-            <h3 className="text-xl font-medium mb-6">TYPICAL TIMELINE</h3>
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-[var(--color-text-tertiary)]">Initial Brief</span>
-                  <span className="text-sm">24-48 Hours</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, idx) => (
+              <div key={idx} className="flex items-start gap-3">
+                <div className="w-5 h-5 bg-[#ff6b35]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check size={14} className="text-[#ff6b35]" />
                 </div>
-                <div className="h-1 bg-[var(--color-bg-secondary)] rounded-full overflow-hidden">
-                  <div className="h-full w-full bg-[var(--color-accent-primary)]"></div>
-                </div>
+                <span className="text-neutral-300 font-light">{feature}</span>
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-[var(--color-text-tertiary)]">Network Search</span>
-                  <span className="text-sm">5-14 Days</span>
-                </div>
-                <div className="h-1 bg-[var(--color-bg-secondary)] rounded-full overflow-hidden">
-                  <div className="h-full w-3/4 bg-[var(--color-accent-primary)]"></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-[var(--color-text-tertiary)]">Verification</span>
-                  <span className="text-sm">3-7 Days</span>
-                </div>
-                <div className="h-1 bg-[var(--color-bg-secondary)] rounded-full overflow-hidden">
-                  <div className="h-full w-1/2 bg-[var(--color-accent-primary)]"></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-[var(--color-text-tertiary)]">Settlement & Delivery</span>
-                  <span className="text-sm">3-5 Days</span>
-                </div>
-                <div className="h-1 bg-[var(--color-bg-secondary)] rounded-full overflow-hidden">
-                  <div className="h-full w-1/3 bg-[var(--color-accent-primary)]"></div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[var(--color-border-primary)]">
-              <p className="text-sm text-[var(--color-text-tertiary)] mb-4">Total Typical Duration</p>
-              <p className="text-2xl font-light">14-30 Days</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section-container section-padding bg-[var(--color-bg-secondary)]">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-subheadline mb-6">INITIATE ACQUISITION</h2>
-          <p className="text-body-large mb-8">
-            Submit a detailed brief through the Private Desk or schedule a confidential consultation to discuss specific requirements.
+      {/* Process */}
+      <section className="container-elita section-padding bg-white/[0.02]">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="heading-3 mb-4 text-center">ACQUISITION PROTOCOL</h2>
+          <p className="body-md text-center mb-16">
+            Five-stage process from initial brief to secure delivery
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/account" className="btn-primary">
-              PRIVATE DESK ACCESS
-              <ArrowRight size={16} />
-            </Link>
-            <Link href="/client-care/schedule-appointment" className="btn-secondary">
+
+          <div className="space-y-12">
+            {process.map((item, idx) => (
+              <div
+                key={idx}
+                className="flex gap-8 slide-up"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                <div className="text-6xl font-extralight text-[#ff6b35]/20 w-24 flex-shrink-0">
+                  {item.step}
+                </div>
+                <div className="flex-1 pt-2">
+                  <h3 className="text-2xl font-light mb-4">{item.title}</h3>
+                  <p className="text-neutral-300 font-light leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container-elita section-padding">
+        <div className="card-elita p-12 text-center bg-gradient-to-br from-white/5 to-transparent">
+          <h2 className="heading-3 mb-6">READY TO BEGIN?</h2>
+          <p className="body-md max-w-2xl mx-auto mb-8">
+            Submit your acquisition brief or schedule a confidential consultation with our sourcing team.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button href="/client-care/submit-asset" size="lg">
+              SUBMIT BRIEF
+            </Button>
+            <Button href="/client-care/schedule-appointment" variant="secondary" size="lg">
               SCHEDULE CONSULTATION
-            </Link>
+            </Button>
           </div>
         </div>
       </section>

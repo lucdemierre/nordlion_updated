@@ -1,27 +1,46 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Navigation } from '@/components/layout/Navigation';
+import { Footer } from '@/components/layout/Footer';
 
-const inter = Inter({
+const inter = Inter({ 
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
-})
+});
 
 export const metadata: Metadata = {
-  title: 'NordLion Auto - Luxury Vehicle Specialists',
-  description: 'Premium luxury vehicle marketplace',
-}
+  title: 'NORDLION | Ultra-Luxury Asset Brokerage',
+  description: 'Premier brokerage for ultra-luxury assets: rare timepieces, exotic vehicles, private jets, superyachts, and exceptional estates.',
+  keywords: 'luxury watches, exotic cars, private jets, yachts, estates, ultra-luxury assets, high-end brokerage',
+  openGraph: {
+    title: 'NORDLION | Ultra-Luxury Asset Brokerage',
+    description: 'Premier brokerage for ultra-luxury assets: rare timepieces, exotic vehicles, private jets, superyachts, and exceptional estates.',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NORDLION | Ultra-Luxury Asset Brokerage',
+    description: 'Premier brokerage for ultra-luxury assets',
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className={inter.className}>{children}</body>
+      <body>
+        <Navigation />
+        <main style={{ paddingTop: '72px', minHeight: '100vh' }}>
+          {children}
+        </main>
+        <Footer />
+      </body>
     </html>
-  )
+  );
 }
